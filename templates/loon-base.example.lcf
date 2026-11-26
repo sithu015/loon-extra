@@ -1,0 +1,227 @@
+# ==============================================================================
+# Loon 3.5.1+ Sanitized Base Configuration Template (Myanmar + Global Routing)
+# Aligned with FinalV1_cleaned.lcf policy groups & sithu015/loon-extra plugins
+# NOTE: Replace [Proxy] with your own nodes; NEVER commit real keys or ca-p12!
+# ==============================================================================
+
+[General]
+doq-server = quic://dns.adguard-dns.com,quic://dns.alidns.com:853,quic://dns.caliph.dev:853,quic://dns.comss.one,quic://dns.dnsguard.pub,quic://dns.jupitrdns.com,quic://dns.surfsharkdns.com,quic://doh.tiar.app,quic://doq.ffmuc.net,quic://family.adguard-dns.com,quic://ibksturm.synology.me
+skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local
+bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32
+dns-server = system,1.1.1.1,8.8.8.8,9.9.9.9
+doh-server = https://1.1.1.1/dns-query,https://dns.mullvad.net/dns-query,https://194.242.2.2/dns-query,https://doh.sb/dns-query,https://dns.controld.com/dns-query,https://dns.alidns.com/dns-query,https://doh.pub/dns-query
+hijack-dns = *:53
+ip-mode = dual
+ipv6-vif = auto
+allow-wifi-access = true
+wifi-access-http-port = 7222
+wifi-access-socks5-port = 7221
+mitm-on-wifi-access = false
+proxy-test-url = http://www.gstatic.com/generate_204
+internet-test-url = http://www.gstatic.com/generate_204
+test-timeout = 5
+interface-mode = auto
+disable-stun = false
+geoip-url = https://gitlab.com/Loon0x00/loon_data/-/raw/main/geo/GeoLite2-Country.mmdb?inline=false
+ipasn-url = https://gitlab.com/Loon0x00/loon_data/-/raw/main/geo/GeoLite2-ASN.mmdb?inline=false
+disconnect-on-policy-change = false
+sni-sniffing = true
+domain-reject-mode = DNS
+dns-reject-mode = NoAnswer
+udp-fallback-mode = DIRECT
+
+[Proxy]
+# Add your own nodes or import via [Remote Proxy]
+# Example:
+# 🇸🇬 Singapore 01 = Shadowsocks,198.51.100.10,8388,aes-256-gcm,"REPLACE_ME",udp=true,block-quic=true
+# 🇺🇸 United States 01 = Shadowsocks,203.0.113.10,8388,aes-256-gcm,"REPLACE_ME",udp=true,block-quic=true
+
+[Remote Proxy]
+
+[Remote Filter]
+
+[Proxy Group]
+# --- Main Category Groups ---
+ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,DIRECT
+🤖 AI Services = select,🇺🇸 United States,🇸🇬 Singapore,🇯🇵 Japan,⚡ Auto (All),ShadowShare,DIRECT
+🎬 Streaming = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
+💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
+🔍 Search & Tech = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,DIRECT
+🍎 Apple Services = select,DIRECT,⚡ Auto (All),🇺🇸 United States,ShadowShare
+🛑 AdBlock = select,REJECT,DIRECT
+
+# --- Regional & Auto Groups (Replace placeholder node names or bind Remote Proxy) ---
+⚡ Auto (All) = url-test,🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,url = http://www.gstatic.com/generate_204,interval = 600,tolerance = 50
+🇸🇬 Singapore = select,DIRECT
+🇺🇸 United States = select,DIRECT
+🇯🇵 Japan = select,DIRECT
+🇭🇰 Hong Kong = select,DIRECT
+
+[Proxy Chain]
+
+[Rule]
+# --- Local & Private Network ---
+IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+
+# --- Advertising & Tracking ---
+DOMAIN-KEYWORD,adservice,🛑 AdBlock
+DOMAIN-SUFFIX,doubleclick.net,🛑 AdBlock
+DOMAIN-SUFFIX,googlesyndication.com,🛑 AdBlock
+DOMAIN-SUFFIX,googleadservices.com,🛑 AdBlock
+DOMAIN-SUFFIX,adnxs.com,🛑 AdBlock
+DOMAIN-SUFFIX,applovin.com,🛑 AdBlock
+DOMAIN-SUFFIX,unityads.unity3d.com,🛑 AdBlock
+DOMAIN-SUFFIX,vungle.com,🛑 AdBlock
+DOMAIN-SUFFIX,appsflyer.com,🛑 AdBlock
+DOMAIN-SUFFIX,adjust.com,🛑 AdBlock
+
+# --- AI Services ---
+DOMAIN-SUFFIX,openai.com,🤖 AI Services
+DOMAIN-SUFFIX,chatgpt.com,🤖 AI Services
+DOMAIN-SUFFIX,oaistatic.com,🤖 AI Services
+DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI Services
+DOMAIN-SUFFIX,anthropic.com,🤖 AI Services
+DOMAIN-SUFFIX,claude.ai,🤖 AI Services
+DOMAIN-SUFFIX,perplexity.ai,🤖 AI Services
+DOMAIN-SUFFIX,cursor.sh,🤖 AI Services
+DOMAIN-SUFFIX,cursor.com,🤖 AI Services
+DOMAIN-SUFFIX,midjourney.com,🤖 AI Services
+DOMAIN-SUFFIX,sora.com,🤖 AI Services
+DOMAIN-SUFFIX,cohere.ai,🤖 AI Services
+DOMAIN-SUFFIX,cohere.com,🤖 AI Services
+DOMAIN-SUFFIX,mistral.ai,🤖 AI Services
+DOMAIN-SUFFIX,poe.com,🤖 AI Services
+DOMAIN-SUFFIX,groq.com,🤖 AI Services
+DOMAIN-SUFFIX,deepseek.com,🤖 AI Services
+DOMAIN-SUFFIX,huggingface.co,🤖 AI Services
+DOMAIN-SUFFIX,gemini.google.com,🤖 AI Services
+DOMAIN-SUFFIX,bard.google.com,🤖 AI Services
+DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 AI Services
+DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,🤖 AI Services
+DOMAIN-KEYWORD,openaicom,🤖 AI Services
+DOMAIN-KEYWORD,colab,🤖 AI Services
+
+# --- Streaming ---
+DOMAIN-SUFFIX,youtube.com,🎬 Streaming
+DOMAIN-SUFFIX,googlevideo.com,🎬 Streaming
+DOMAIN-SUFFIX,ytimg.com,🎬 Streaming
+DOMAIN-SUFFIX,youtu.be,🎬 Streaming
+DOMAIN-SUFFIX,netflix.com,🎬 Streaming
+DOMAIN-SUFFIX,netflix.net,🎬 Streaming
+DOMAIN-SUFFIX,nflximg.net,🎬 Streaming
+DOMAIN-SUFFIX,nflxvideo.net,🎬 Streaming
+DOMAIN-SUFFIX,nflxso.net,🎬 Streaming
+DOMAIN-SUFFIX,nflxext.com,🎬 Streaming
+DOMAIN-SUFFIX,spotify.com,🎬 Streaming
+DOMAIN-SUFFIX,scdn.co,🎬 Streaming
+DOMAIN-SUFFIX,spoti.fi,🎬 Streaming
+DOMAIN-SUFFIX,disneyplus.com,🎬 Streaming
+DOMAIN-SUFFIX,disney-plus.net,🎬 Streaming
+DOMAIN-SUFFIX,dssott.com,🎬 Streaming
+DOMAIN-SUFFIX,bamgrid.com,🎬 Streaming
+DOMAIN-SUFFIX,twitch.tv,🎬 Streaming
+DOMAIN-SUFFIX,ttvnw.net,🎬 Streaming
+DOMAIN-SUFFIX,primevideo.com,🎬 Streaming
+DOMAIN-SUFFIX,amazonvideo.com,🎬 Streaming
+DOMAIN-SUFFIX,hbo.com,🎬 Streaming
+DOMAIN-SUFFIX,hbomax.com,🎬 Streaming
+DOMAIN-SUFFIX,max.com,🎬 Streaming
+
+# --- Social Media ---
+DOMAIN-SUFFIX,t.me,💬 Social Media
+DOMAIN-SUFFIX,telegram.org,💬 Social Media
+DOMAIN-SUFFIX,telegram.me,💬 Social Media
+DOMAIN-SUFFIX,tdesktop.com,💬 Social Media
+IP-CIDR,91.108.4.0/22,💬 Social Media,no-resolve
+IP-CIDR,91.108.8.0/22,💬 Social Media,no-resolve
+IP-CIDR,91.108.12.0/22,💬 Social Media,no-resolve
+IP-CIDR,91.108.16.0/22,💬 Social Media,no-resolve
+IP-CIDR,91.108.56.0/22,💬 Social Media,no-resolve
+IP-CIDR,149.154.160.0/20,💬 Social Media,no-resolve
+IP-CIDR,149.154.164.0/22,💬 Social Media,no-resolve
+IP-CIDR,149.154.168.0/22,💬 Social Media,no-resolve
+IP-CIDR,149.154.172.0/22,💬 Social Media,no-resolve
+DOMAIN-SUFFIX,twitter.com,💬 Social Media
+DOMAIN-SUFFIX,x.com,💬 Social Media
+DOMAIN-SUFFIX,twimg.com,💬 Social Media
+DOMAIN-SUFFIX,t.co,💬 Social Media
+DOMAIN-SUFFIX,facebook.com,💬 Social Media
+DOMAIN-SUFFIX,fbcdn.net,💬 Social Media
+DOMAIN-SUFFIX,fbsbx.com,💬 Social Media
+DOMAIN-SUFFIX,instagram.com,💬 Social Media
+DOMAIN-SUFFIX,cdninstagram.com,💬 Social Media
+DOMAIN-SUFFIX,threads.net,💬 Social Media
+DOMAIN-SUFFIX,whatsapp.com,💬 Social Media
+DOMAIN-SUFFIX,whatsapp.net,💬 Social Media
+DOMAIN-SUFFIX,reddit.com,💬 Social Media
+DOMAIN-SUFFIX,redditmedia.com,💬 Social Media
+DOMAIN-SUFFIX,redd.it,💬 Social Media
+DOMAIN-SUFFIX,discord.com,💬 Social Media
+DOMAIN-SUFFIX,discordapp.com,💬 Social Media
+DOMAIN-SUFFIX,discord.gg,💬 Social Media
+DOMAIN-SUFFIX,tiktok.com,💬 Social Media
+DOMAIN-SUFFIX,tiktokcdn.com,💬 Social Media
+DOMAIN-SUFFIX,byteoversea.com,💬 Social Media
+DOMAIN-SUFFIX,signal.org,💬 Social Media
+
+# --- Search & Tech ---
+DOMAIN-SUFFIX,google.com,🔍 Search & Tech
+DOMAIN-SUFFIX,google.com.sg,🔍 Search & Tech
+DOMAIN-SUFFIX,gstatic.com,🔍 Search & Tech
+DOMAIN-SUFFIX,googleapis.com,🔍 Search & Tech
+DOMAIN-SUFFIX,googleusercontent.com,🔍 Search & Tech
+DOMAIN-SUFFIX,github.com,🔍 Search & Tech
+DOMAIN-SUFFIX,githubassets.com,🔍 Search & Tech
+DOMAIN-SUFFIX,githubusercontent.com,🔍 Search & Tech
+DOMAIN-SUFFIX,microsoft.com,🔍 Search & Tech
+DOMAIN-SUFFIX,bing.com,🔍 Search & Tech
+DOMAIN-SUFFIX,live.com,🔍 Search & Tech
+DOMAIN-SUFFIX,office.com,🔍 Search & Tech
+DOMAIN-SUFFIX,office365.com,🔍 Search & Tech
+DOMAIN-SUFFIX,onedrive.com,🔍 Search & Tech
+DOMAIN-SUFFIX,wikipedia.org,🔍 Search & Tech
+DOMAIN-SUFFIX,wikimedia.org,🔍 Search & Tech
+DOMAIN-SUFFIX,cloudflare.com,🔍 Search & Tech
+DOMAIN-SUFFIX,gitlab.com,🔍 Search & Tech
+DOMAIN-SUFFIX,stackexchange.com,🔍 Search & Tech
+DOMAIN-SUFFIX,stackoverflow.com,🔍 Search & Tech
+
+# --- Apple Services ---
+DOMAIN-SUFFIX,apple.com,🍎 Apple Services
+DOMAIN-SUFFIX,icloud.com,🍎 Apple Services
+DOMAIN-SUFFIX,icloud-content.com,🍎 Apple Services
+DOMAIN-SUFFIX,mzstatic.com,🍎 Apple Services
+DOMAIN-SUFFIX,apple-cloudkit.com,🍎 Apple Services
+DOMAIN-SUFFIX,aaplimg.com,🍎 Apple Services
+DOMAIN-SUFFIX,apple-dns.net,🍎 Apple Services
+DOMAIN-SUFFIX,itunes.com,🍎 Apple Services
+
+# --- Fallback Rule ---
+FINAL,ShadowShare
+
+[Remote Rule]
+https://raw.githubusercontent.com/sithu015/loon-rules/main/AI.list, policy=🤖 AI Services, tag=AI Services (loon-rules), enabled=true
+https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/loon/global.list, policy=⚡ Auto (All), tag=global.list, enabled=true
+
+[Rewrite]
+
+[Host]
+
+[Script]
+
+[Remote Script]
+
+[Plugin]
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/myanmar-essential.lpx, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-auth-proxy.lpx, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=false
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx, enabled=false
+
+[MITM]
+hostname =
+skip-server-cert-verify = false

@@ -1,0 +1,139 @@
+#!name = Myanmar Essential
+#!desc = Myanmar Banking, Telecom, Government & Local Services (DIRECT), Blocked Independent Media (PROXY), and Ad/Tracker Blocking (REJECT) for Loon 3.5.1+
+#!author = sithu015
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/icon.png
+#!source = 2816d0e79e4efc889eb6bb7370a73e174e9295c59eba5c0300cd81e9e2c01194, a54424d3f1dd018fe5e1ede23dbf87ec9adc835837c3d36303bbd4d4de4a9bd9
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = Myanmar,Routing,AdBlock
+#!type = normal
+
+[Argument]
+blockMetaPixel = switch,false,type=boolean,tag=Block Meta Pixel (MitM),desc=Requires MitM on facebook.com (install meta-pixel-mitm.lpx or add www.facebook.com to [MITM]); keep off unless needed
+
+[Rule]
+# ==============================================================================
+# 1. Apple Services Fallback Fixes (Log-Observed)
+# ==============================================================================
+DOMAIN,c.apple.news,DIRECT
+DOMAIN,cdn.apple-mapkit.com,DIRECT
+
+# ==============================================================================
+# 2. Myanmar Banks & Mobile Payment Apps (DIRECT — Geo-Block & Pinning Safe)
+# ==============================================================================
+DOMAIN-SUFFIX,kbzbank.com,DIRECT
+DOMAIN-SUFFIX,kbzpay.com,DIRECT
+DOMAIN-SUFFIX,wavemoney.com.mm,DIRECT
+DOMAIN-SUFFIX,ayabank.com,DIRECT
+DOMAIN-SUFFIX,ayaibanking.com,DIRECT
+DOMAIN-SUFFIX,ayacib.com,DIRECT
+DOMAIN-SUFFIX,ayapay.com,DIRECT
+DOMAIN-SUFFIX,cbbank.com.mm,DIRECT
+DOMAIN-SUFFIX,uab.com.mm,DIRECT
+DOMAIN-SUFFIX,uabpay.com.mm,DIRECT
+DOMAIN-SUFFIX,yomabank.com,DIRECT
+DOMAIN-SUFFIX,mabbank.com,DIRECT
+DOMAIN-SUFFIX,abank.com.mm,DIRECT
+DOMAIN-SUFFIX,agdbank.com.mm,DIRECT
+DOMAIN-SUFFIX,myanmarpaymentunion.com,DIRECT
+DOMAIN-SUFFIX,mpu-ecommerce.com,DIRECT
+DOMAIN-SUFFIX,onepay.com.mm,DIRECT
+DOMAIN-SUFFIX,mcb.com.mm,DIRECT
+DOMAIN-SUFFIX,okdollar.com,DIRECT
+DOMAIN-SUFFIX,truemoney.com.mm,DIRECT
+
+# ==============================================================================
+# 3. Myanmar Telecoms & ISPs (DIRECT)
+# ==============================================================================
+DOMAIN-SUFFIX,mpt.com.mm,DIRECT
+DOMAIN-SUFFIX,atom.com.mm,DIRECT
+DOMAIN-SUFFIX,telenor.com.mm,DIRECT
+DOMAIN-SUFFIX,u9.com.mm,DIRECT
+DOMAIN-SUFFIX,ooredoo.com.mm,DIRECT
+DOMAIN-SUFFIX,mytel.com.mm,DIRECT
+DOMAIN-SUFFIX,myanmarnet.com,DIRECT
+DOMAIN-SUFFIX,5bb.com.mm,DIRECT
+DOMAIN-SUFFIX,welinkbroadband.com,DIRECT
+DOMAIN-SUFFIX,maharnet.com,DIRECT
+
+# ==============================================================================
+# 4. Myanmar Government, Education & Utilities (DIRECT)
+# ==============================================================================
+DOMAIN-SUFFIX,gov.mm,DIRECT
+DOMAIN-SUFFIX,edu.mm,DIRECT
+DOMAIN-SUFFIX,com.mm,DIRECT
+DOMAIN-SUFFIX,org.mm,DIRECT
+DOMAIN-SUFFIX,net.mm,DIRECT
+DOMAIN-SUFFIX,yesc.com.mm,DIRECT
+DOMAIN-SUFFIX,mescmm.com,DIRECT
+DOMAIN-SUFFIX,ysx-mm.com,DIRECT
+
+# ==============================================================================
+# 5. Myanmar E-Commerce, Delivery, Real Estate, Jobs & Domestic Media (DIRECT)
+# ==============================================================================
+DOMAIN-SUFFIX,shop.com.mm,DIRECT
+DOMAIN-SUFFIX,citymall.com.mm,DIRECT
+DOMAIN-SUFFIX,citymallcentersmm.com,DIRECT
+DOMAIN-SUFFIX,foodpanda.com.mm,DIRECT
+DOMAIN-SUFFIX,grab.com,DIRECT
+DOMAIN-SUFFIX,imyanmarhouse.com,DIRECT
+DOMAIN-SUFFIX,shweproperty.com,DIRECT
+DOMAIN-SUFFIX,carsdb.com,DIRECT
+DOMAIN-SUFFIX,imyanmarmarket.com,DIRECT
+DOMAIN-SUFFIX,jobnet.com.mm,DIRECT
+DOMAIN-SUFFIX,myjobs.com.mm,DIRECT
+DOMAIN-SUFFIX,yangondirectory.com,DIRECT
+DOMAIN-SUFFIX,elevenmyanmar.com,DIRECT
+DOMAIN-SUFFIX,popularmyanmar.com,DIRECT
+DOMAIN-SUFFIX,duwun.com.mm,DIRECT
+DOMAIN-SUFFIX,thutazone.net,DIRECT
+DOMAIN-SUFFIX,gnlm.com.mm,DIRECT
+
+# ==============================================================================
+# 6. Independent & International Burmese Media (PROXY — Blocked inside Myanmar)
+# ==============================================================================
+DOMAIN-SUFFIX,irrawaddy.com,PROXY
+DOMAIN-SUFFIX,dvb.no,PROXY
+DOMAIN-SUFFIX,mizzima.com,PROXY
+DOMAIN-SUFFIX,mizzimaburmese.com,PROXY
+DOMAIN-SUFFIX,mizzima.tv,PROXY
+DOMAIN-SUFFIX,mizzimaweekly.com,PROXY
+DOMAIN-SUFFIX,myanmar-now.org,PROXY
+DOMAIN-SUFFIX,yktnews.com,PROXY
+DOMAIN-SUFFIX,khitthitnews.com,PROXY
+DOMAIN-SUFFIX,frontiermyanmar.net,PROXY
+DOMAIN-SUFFIX,rfa.org,PROXY
+DOMAIN-SUFFIX,bbc.com,PROXY
+DOMAIN-SUFFIX,voanews.com,PROXY
+DOMAIN-SUFFIX,narinjara.com,PROXY
+DOMAIN-SUFFIX,kicnews.org,PROXY
+DOMAIN-SUFFIX,shannews.org,PROXY
+DOMAIN-SUFFIX,myitkyinanewsjournal.com,PROXY
+DOMAIN-SUFFIX,ktimes.org,PROXY
+DOMAIN-SUFFIX,bnionline.net,PROXY
+
+# ==============================================================================
+# 7. Additional Ad Networks & Trackers (REJECT — Complements FinalV1.lcf)
+# ==============================================================================
+DOMAIN-SUFFIX,google-analytics.com,REJECT
+DOMAIN-SUFFIX,googletagmanager.com,REJECT
+DOMAIN-SUFFIX,mgid.com,REJECT
+DOMAIN-SUFFIX,taboola.com,REJECT
+DOMAIN-SUFFIX,outbrain.com,REJECT
+DOMAIN-SUFFIX,revcontent.com,REJECT
+DOMAIN-SUFFIX,media.net,REJECT
+DOMAIN-SUFFIX,highperformanceformat.com,REJECT
+DOMAIN-SUFFIX,popads.net,REJECT
+DOMAIN-SUFFIX,propellerads.com,REJECT
+DOMAIN-SUFFIX,connect.facebook.net,REJECT
+DOMAIN-SUFFIX,analytics.tiktok.com,REJECT
+DOMAIN-SUFFIX,clarity.ms,REJECT
+DOMAIN-SUFFIX,bat.bing.com,REJECT
+DOMAIN-SUFFIX,appsflyersdk.com,REJECT
+
+[Rewrite]
+# Optional Loon 3.5.1+ Rewrite v2 rule for Meta Pixel tracking endpoint
+request if ${blockMetaPixel} == true && ${url} ~= /^https?:\/\/(www\.)?facebook\.com\/tr/ then reject_img(200)

@@ -1,0 +1,23 @@
+# ==============================================================================
+# Independent & International Burmese Media (Blocked inside Myanmar)
+# Recommended Remote Rule Policy: ShadowShare (or ⚡ Auto (All) / 🇸🇬 Singapore)
+# ==============================================================================
+DOMAIN-SUFFIX,irrawaddy.com
+DOMAIN-SUFFIX,dvb.no
+DOMAIN-SUFFIX,mizzima.com
+DOMAIN-SUFFIX,mizzimaburmese.com
+DOMAIN-SUFFIX,mizzima.tv
+DOMAIN-SUFFIX,mizzimaweekly.com
+DOMAIN-SUFFIX,myanmar-now.org
+DOMAIN-SUFFIX,yktnews.com
+DOMAIN-SUFFIX,khitthitnews.com
+DOMAIN-SUFFIX,frontiermyanmar.net
+DOMAIN-SUFFIX,rfa.org
+DOMAIN-SUFFIX,bbc.com
+DOMAIN-SUFFIX,voanews.com
+DOMAIN-SUFFIX,narinjara.com
+DOMAIN-SUFFIX,kicnews.org
+DOMAIN-SUFFIX,shannews.org
+DOMAIN-SUFFIX,myitkyinanewsjournal.com
+DOMAIN-SUFFIX,ktimes.org
+DOMAIN-SUFFIX,bnionline.net

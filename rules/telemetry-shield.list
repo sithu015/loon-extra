@@ -1,0 +1,29 @@
+# ==============================================================================
+# Optional Telemetry & Analytics Shield
+# Recommended Remote Rule Policy: 🛑 AdBlock (or REJECT)
+# ==============================================================================
+DOMAIN-SUFFIX,app-measurement.com
+DOMAIN-SUFFIX,firebase-settings.crashlytics.com
+DOMAIN-SUFFIX,branch.io
+DOMAIN-SUFFIX,app.link
+DOMAIN-SUFFIX,braze.com
+DOMAIN-SUFFIX,mixpanel.com
+DOMAIN-SUFFIX,amplitude.com
+DOMAIN-SUFFIX,segment.io
+DOMAIN-SUFFIX,segment.com
+DOMAIN-SUFFIX,onesignal.com
+DOMAIN-SUFFIX,clevertap-prod.com
+DOMAIN-SUFFIX,hotjar.com
+DOMAIN-SUFFIX,hotjar.io
+DOMAIN-SUFFIX,fullstory.com
+DOMAIN-SUFFIX,mouseflow.com
+DOMAIN-SUFFIX,luckyorange.com
+DOMAIN-SUFFIX,scorecardresearch.com
+DOMAIN-SUFFIX,quantserve.com
+DOMAIN-SUFFIX,datadoghq.com
+DOMAIN-SUFFIX,bugsnag.com
+DOMAIN-SUFFIX,telemetry.mozilla.org
+DOMAIN-SUFFIX,ads-img.mozilla.org
+DOMAIN-SUFFIX,mobile.events.data.microsoft.com
+DOMAIN-SUFFIX,vortex.data.microsoft.com
+DOMAIN-SUFFIX,gvt2.com

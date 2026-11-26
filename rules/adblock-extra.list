@@ -1,0 +1,19 @@
+# ==============================================================================
+# Additional Ad Networks & Trackers (Complements FinalV1.lcf)
+# Recommended Remote Rule Policy: 🛑 AdBlock (or REJECT)
+# ==============================================================================
+DOMAIN-SUFFIX,google-analytics.com
+DOMAIN-SUFFIX,googletagmanager.com
+DOMAIN-SUFFIX,mgid.com
+DOMAIN-SUFFIX,taboola.com
+DOMAIN-SUFFIX,outbrain.com
+DOMAIN-SUFFIX,revcontent.com
+DOMAIN-SUFFIX,media.net
+DOMAIN-SUFFIX,highperformanceformat.com
+DOMAIN-SUFFIX,popads.net
+DOMAIN-SUFFIX,propellerads.com
+DOMAIN-SUFFIX,connect.facebook.net
+DOMAIN-SUFFIX,analytics.tiktok.com
+DOMAIN-SUFFIX,clarity.ms
+DOMAIN-SUFFIX,bat.bing.com
+DOMAIN-SUFFIX,appsflyersdk.com

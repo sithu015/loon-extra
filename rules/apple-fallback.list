@@ -1,0 +1,6 @@
+# ==============================================================================
+# Apple Services Fallback Fixes (Log-Observed)
+# Recommended Remote Rule Policy: DIRECT (or 🍎 Apple Services)
+# ==============================================================================
+DOMAIN,c.apple.news
+DOMAIN,cdn.apple-mapkit.com

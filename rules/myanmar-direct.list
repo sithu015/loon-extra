@@ -1,0 +1,67 @@
+# ==============================================================================
+# Myanmar Banks, Payments, Telecoms, Gov, Utilities & Local Services
+# Recommended Remote Rule Policy: DIRECT
+# ==============================================================================
+
+# --- Banks & Mobile Payments ---
+DOMAIN-SUFFIX,kbzbank.com
+DOMAIN-SUFFIX,kbzpay.com
+DOMAIN-SUFFIX,wavemoney.com.mm
+DOMAIN-SUFFIX,ayabank.com
+DOMAIN-SUFFIX,ayaibanking.com
+DOMAIN-SUFFIX,ayacib.com
+DOMAIN-SUFFIX,ayapay.com
+DOMAIN-SUFFIX,cbbank.com.mm
+DOMAIN-SUFFIX,uab.com.mm
+DOMAIN-SUFFIX,uabpay.com.mm
+DOMAIN-SUFFIX,yomabank.com
+DOMAIN-SUFFIX,mabbank.com
+DOMAIN-SUFFIX,abank.com.mm
+DOMAIN-SUFFIX,agdbank.com.mm
+DOMAIN-SUFFIX,myanmarpaymentunion.com
+DOMAIN-SUFFIX,mpu-ecommerce.com
+DOMAIN-SUFFIX,onepay.com.mm
+DOMAIN-SUFFIX,mcb.com.mm
+DOMAIN-SUFFIX,okdollar.com
+DOMAIN-SUFFIX,truemoney.com.mm
+
+# --- Telecoms & ISPs ---
+DOMAIN-SUFFIX,mpt.com.mm
+DOMAIN-SUFFIX,atom.com.mm
+DOMAIN-SUFFIX,telenor.com.mm
+DOMAIN-SUFFIX,u9.com.mm
+DOMAIN-SUFFIX,ooredoo.com.mm
+DOMAIN-SUFFIX,mytel.com.mm
+DOMAIN-SUFFIX,myanmarnet.com
+DOMAIN-SUFFIX,5bb.com.mm
+DOMAIN-SUFFIX,welinkbroadband.com
+DOMAIN-SUFFIX,maharnet.com
+
+# --- Government, Education & Utilities ---
+DOMAIN-SUFFIX,gov.mm
+DOMAIN-SUFFIX,edu.mm
+DOMAIN-SUFFIX,com.mm
+DOMAIN-SUFFIX,org.mm
+DOMAIN-SUFFIX,net.mm
+DOMAIN-SUFFIX,yesc.com.mm
+DOMAIN-SUFFIX,mescmm.com
+DOMAIN-SUFFIX,ysx-mm.com
+
+# --- E-Commerce, Delivery, Real Estate, Jobs & Domestic Media ---
+DOMAIN-SUFFIX,shop.com.mm
+DOMAIN-SUFFIX,citymall.com.mm
+DOMAIN-SUFFIX,citymallcentersmm.com
+DOMAIN-SUFFIX,foodpanda.com.mm
+DOMAIN-SUFFIX,grab.com
+DOMAIN-SUFFIX,imyanmarhouse.com
+DOMAIN-SUFFIX,shweproperty.com
+DOMAIN-SUFFIX,carsdb.com
+DOMAIN-SUFFIX,imyanmarmarket.com
+DOMAIN-SUFFIX,jobnet.com.mm
+DOMAIN-SUFFIX,myjobs.com.mm
+DOMAIN-SUFFIX,yangondirectory.com
+DOMAIN-SUFFIX,elevenmyanmar.com
+DOMAIN-SUFFIX,popularmyanmar.com
+DOMAIN-SUFFIX,duwun.com.mm
+DOMAIN-SUFFIX,thutazone.net
+DOMAIN-SUFFIX,gnlm.com.mm

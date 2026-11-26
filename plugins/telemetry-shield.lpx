@@ -1,0 +1,44 @@
+#!name = Telemetry & Analytics Shield
+#!desc = Optional app telemetry, crash analytics, and attribution tracker blocker for Loon 3.5.1+ (keeps dev services like Sentry off by default)
+#!author = sithu015
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/telemetry-shield.png
+#!source = 593553bc6e23c988bb1d064ef89a9f01d1b32fdac5d256ab69c9940528e865dd, dbf2179bce8ee57adb41bb1cdf04eddf4ce72e9053fa8e868089b4a569b240b1
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = Privacy,AdBlock,Telemetry
+#!type = normal
+
+[Rule]
+# --- Mobile & Cross-App Attribution / Analytics ---
+DOMAIN-SUFFIX,app-measurement.com,REJECT
+DOMAIN-SUFFIX,firebase-settings.crashlytics.com,REJECT
+DOMAIN-SUFFIX,branch.io,REJECT
+DOMAIN-SUFFIX,app.link,REJECT
+DOMAIN-SUFFIX,braze.com,REJECT
+DOMAIN-SUFFIX,mixpanel.com,REJECT
+DOMAIN-SUFFIX,amplitude.com,REJECT
+DOMAIN-SUFFIX,segment.io,REJECT
+DOMAIN-SUFFIX,segment.com,REJECT
+DOMAIN-SUFFIX,onesignal.com,REJECT
+DOMAIN-SUFFIX,clevertap-prod.com,REJECT
+
+# --- Web Session Replay, Telemetry & Heatmaps ---
+DOMAIN-SUFFIX,hotjar.com,REJECT
+DOMAIN-SUFFIX,hotjar.io,REJECT
+DOMAIN-SUFFIX,fullstory.com,REJECT
+DOMAIN-SUFFIX,mouseflow.com,REJECT
+DOMAIN-SUFFIX,luckyorange.com,REJECT
+DOMAIN-SUFFIX,scorecardresearch.com,REJECT
+DOMAIN-SUFFIX,quantserve.com,REJECT
+DOMAIN-SUFFIX,datadoghq.com,REJECT
+DOMAIN-SUFFIX,bugsnag.com,REJECT
+
+# --- OS & Browser Telemetry ---
+DOMAIN-SUFFIX,telemetry.mozilla.org,REJECT
+DOMAIN-SUFFIX,ads-img.mozilla.org,REJECT
+DOMAIN-SUFFIX,mobile.events.data.microsoft.com,REJECT
+DOMAIN-SUFFIX,vortex.data.microsoft.com,REJECT
+DOMAIN-SUFFIX,gvt2.com,REJECT

@@ -1,0 +1,28 @@
+name: Validate Loon Plugins & Rules
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify #!source SHA-256 hashes
+        run: python3 scripts/update_sources.py --check
+
+      - name: Validate plugins, rulesets, and templates
+        run: python3 scripts/validate_loon.py --strict
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -v

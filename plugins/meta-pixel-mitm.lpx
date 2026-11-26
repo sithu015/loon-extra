@@ -1,0 +1,26 @@
+#!name = Meta Pixel Shield (MitM)
+#!desc = Companion MitM plugin to block Meta Pixel (facebook.com/tr) and Privacy Sandbox pixel requests without forcing Facebook MitM in Myanmar Essential
+#!author = sithu015
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/meta-pixel-mitm.png
+#!source = 146d9e0fe8094d4fff8c38815f1f8da9e712c9f094face3d7c54aab5e88a67a5, 548c6a9234035413550081604d08aab9fb7b447c36480f075635f474b2b8de32
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = Privacy,AdBlock,MitM
+#!type = normal
+
+[Argument]
+blockMetaPixel = switch,true,type=boolean,tag=Block Meta Pixel (/tr),desc=Returns a 1x1 transparent GIF for facebook.com/tr pixel requests
+blockTopics = switch,true,type=boolean,tag=Block Meta Privacy Sandbox,desc=Blocks facebook.com privacy_sandbox pixel endpoints
+
+[Rule]
+DOMAIN-SUFFIX,connect.facebook.net,REJECT
+
+[Rewrite]
+request if ${blockMetaPixel} == true && ${url} ~= /^https?:\/\/(www\.)?facebook\.com\/tr(?:\/|\?|$)/ then reject_img(200)
+request if ${blockTopics} == true && ${url} ~= /^https?:\/\/(www\.)?facebook\.com\/privacy_sandbox\/pixel\// then reject_img(200)
+
+[Mitm]
+hostname = www.facebook.com, facebook.com

@@ -1,0 +1,24 @@
+# macOS & Editor
+.DS_Store
+.AppleDouble
+.LSOverride
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Sensitive Loon local configs & certificates (NEVER commit personal nodes or MitM CA keys)
+*.local.lcf
+*.persistence
+*.p12
+*.pem
+*.key
+FinalV1*.lcf
+loonconfig*.conf
+ShadowShare*.conf
