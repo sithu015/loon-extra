@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+<mask id="yt-cut">
+  <rect width="1024" height="1024" fill="white"/>
+  <path d="M 456.00 400.00 L 596.00 478.00 L 456.00 556.00 Z" fill="black" stroke="black" stroke-width="20" stroke-linejoin="round"/>
+</mask>
+  </defs>
+  <g id="foreground">
+    <rect x="252" y="314" width="520" height="328" rx="64" fill="#FFFFFF" mask="url(#yt-cut)"/><rect x="316" y="680" width="392" height="36" rx="16" fill="#FFFFFF"/><rect x="370" y="740" width="284" height="36" rx="16" fill="#FFFFFF" opacity="0.82"/>
+  </g>
+</svg>

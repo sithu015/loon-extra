@@ -36,6 +36,8 @@ class LoonExtraValidationTests(unittest.TestCase):
     def _copy_plugin_workspace(self, tmp_root: Path) -> None:
         shutil.copytree(ROOT / "plugins", tmp_root / "plugins")
         shutil.copytree(ROOT / "assets", tmp_root / "assets")
+        if (ROOT / "scripts" / "loon").is_dir():
+            shutil.copytree(ROOT / "scripts" / "loon", tmp_root / "scripts" / "loon")
         shutil.copy2(ROOT / "icon.png", tmp_root / "icon.png")
         (tmp_root / "rules").mkdir()
         (tmp_root / "templates").mkdir()
@@ -92,6 +94,21 @@ class LoonExtraValidationTests(unittest.TestCase):
             r.write_text("DOMAIN-SUFFIX,example.com,DIRECT\n", encoding="utf-8")
             report = validate_loon.run_validation(tmp_root)
             self.assertTrue(any("without policy" in e for e in report.errors), report.errors)
+
+    def test_rejects_missing_local_script_and_undefined_script_arg(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            self._copy_plugin_workspace(tmp_root)
+            (tmp_root / "scripts" / "loon").mkdir(parents=True, exist_ok=True)
+            p = tmp_root / "plugins" / "myanmar-essential.lpx"
+            p.write_text(
+                p.read_text(encoding="utf-8")
+                + '\n[Script]\nresponse if ${url} ~= /^https:\\/\\/example\\.com/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/missing.js", {${missingArg}}) with requires_body=true\n',
+                encoding="utf-8",
+            )
+            report = validate_loon.run_validation(tmp_root)
+            self.assertTrue(any("missing.js" in e for e in report.errors), report.errors)
+            self.assertTrue(any("missingArg" in e for e in report.errors), report.errors)
 
 
 if __name__ == "__main__":

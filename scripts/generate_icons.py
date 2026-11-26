@@ -491,6 +491,11 @@ FLAME_POLY = _build_flame_poly()
 BALLOON_LEFT_RIB, BALLOON_RIGHT_RIB = _build_balloon_ribs()
 SHIELD_POLY = _build_shield_poly()
 ASTROID_POLY = _build_astroid_poly()
+PLAY_TRI_POLY = [
+    (-56.0, -112.0),
+    (84.0, -34.0),
+    (-56.0, 44.0),
+]
 
 
 def _blend_rgb(
@@ -740,6 +745,25 @@ def _render_icon(
                         if sh_a > 0.0:
                             col = _blend_rgb(col, white, sh_a * 0.96)
 
+                elif motif == "youtube":
+                    # Play frame with negative-space triangle + dual-subtitle stacked bars
+                    if abs(px) <= 280.0 and -215.0 <= py <= 145.0:
+                        d_screen = _sd_rounded_box(px, py + 34.0, 260.0, 164.0, 64.0)
+                        d_play = _sd_polygon(px, py, PLAY_TRI_POLY) - 10.0
+                        d_cut = max(d_screen, -d_play)
+                        sc_a = 1.0 - _smoothstep(-1.1, 1.1, d_cut)
+                        if sc_a > 0.0:
+                            col = _blend_rgb(col, white, sc_a * 0.96)
+                    if abs(px) <= 240.0 and 155.0 <= py <= 315.0:
+                        d_bar1 = _sd_rounded_box(px, py - 186.0, 196.0, 18.0, 16.0)
+                        b1_a = 1.0 - _smoothstep(-1.1, 1.1, d_bar1)
+                        if b1_a > 0.0:
+                            col = _blend_rgb(col, white, b1_a * 0.94)
+                        d_bar2 = _sd_rounded_box(px, py - 246.0, 142.0, 18.0, 16.0)
+                        b2_a = 1.0 - _smoothstep(-1.1, 1.1, d_bar2)
+                        if b2_a > 0.0:
+                            col = _blend_rgb(col, gold, b2_a * 0.98)
+
             r8 = int(round(_clamp(col[0]) * 255))
             g8 = int(round(_clamp(col[1]) * 255))
             b8 = int(round(_clamp(col[2]) * 255))
@@ -876,6 +900,31 @@ def _generate_all_svgs() -> None:
         fg_elements_mono=[f'<path d="{sh_d}" fill="#FFFFFF" mask="url(#shield-cut)"/>'],
     )
 
+    # 5. YouTube Myanmar & DualSub SVG
+    play_d = _svg_poly_path(PLAY_TRI_POLY)
+    yt_mask = [
+        '<mask id="yt-cut">',
+        '  <rect width="1024" height="1024" fill="white"/>',
+        f'  <path d="{play_d}" fill="black" stroke="black" stroke-width="20" stroke-linejoin="round"/>',
+        "</mask>",
+    ]
+    _write_svgs(
+        "youtube-myanmar-enhance",
+        "#9B142C",
+        "#4A0D36",
+        defs_extra=yt_mask,
+        fg_elements_color=[
+            '<rect x="252" y="314" width="520" height="328" rx="64" fill="#FFFFFF" mask="url(#yt-cut)" opacity="0.96"/>',
+            '<rect x="316" y="680" width="392" height="36" rx="16" fill="#FFFFFF" opacity="0.94"/>',
+            '<rect x="370" y="740" width="284" height="36" rx="16" fill="#FFD452" opacity="0.98"/>',
+        ],
+        fg_elements_mono=[
+            '<rect x="252" y="314" width="520" height="328" rx="64" fill="#FFFFFF" mask="url(#yt-cut)"/>',
+            '<rect x="316" y="680" width="392" height="36" rx="16" fill="#FFFFFF"/>',
+            '<rect x="370" y="740" width="284" height="36" rx="16" fill="#FFFFFF" opacity="0.82"/>',
+        ],
+    )
+
 
 def main() -> None:
     write_grid_overlay_svg()
@@ -914,6 +963,14 @@ def main() -> None:
             "shield",
             [ROOT / "assets/icons/telemetry-shield.png"],
             ROOT / "assets/icons/squircle/telemetry-shield.png",
+        ),
+        (
+            "youtube-myanmar-enhance",
+            "#9B142C",
+            "#4A0D36",
+            "youtube",
+            [ROOT / "assets/icons/youtube-myanmar-enhance.png"],
+            ROOT / "assets/icons/squircle/youtube-myanmar-enhance.png",
         ),
     ]
 

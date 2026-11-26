@@ -42,6 +42,7 @@ class IconDesignSystemTests(unittest.TestCase):
         "google-ai-auth-proxy",
         "meta-pixel-mitm",
         "telemetry-shield",
+        "youtube-myanmar-enhance",
     )
 
     def test_unmasked_masters_are_1024_opaque_srgb(self) -> None:

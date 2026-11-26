@@ -1,0 +1,35 @@
+#!name = YouTube Myanmar & DualSub
+#!desc = Unified YouTube AdBlock, PiP & Background Play, Burmese (my) translation unlock, and Dual Subtitles (Original + Myanmar) for Loon 3.5.1+
+#!author = sithu015
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/youtube-myanmar-enhance.png
+#!source = 2e2fd9acba621fcdb6d3dd116499c6aff1c80619bcd347040fa1acc8f5899ed7, 4a65ff80413c85e866d2a98a3a63e8e36da77bd010a1a2b8cb0b3317d89514a0
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = YouTube,Myanmar,Subtitles,AdBlock,MitM
+#!type = normal
+
+[Argument]
+subtitleMode = select, "dual_orig_top", "dual_my_top", "my_only", type=string, tag=Subtitle Display / စာတန်းထိုးပုံစံ, desc=dual_orig_top (Original+Myanmar) / dual_my_top (Myanmar+Original) / my_only (Myanmar only)
+translationMode = select, "hybrid", "google_only", "youtube_only", type=string, tag=Translation Engine / ဘာသာပြန်စနစ်, desc=hybrid (YouTube Native + Google Fallback) / google_only (Google Translate) / youtube_only (YouTube Native only)
+autoMyanmar = switch, true, type=boolean, tag=Auto Myanmar Captions / မြန်မာစာတန်းထိုး အလိုအလျောက်, desc=Unlocks Burmese (my) translation menu and auto-activates Myanmar Dual captions
+enableAdBlock = switch, true, type=boolean, tag=YouTube AdBlock / ကြော်ငြာပိတ်, desc=Blocks YouTube pre-roll/mid-roll ads, ad stats, and player adSlots
+enablePipBg = switch, true, type=boolean, tag=PiP & Background Play / နောက်ခံဖွင့်, desc=Enables Picture-in-Picture and background playback in YouTube player responses
+
+[Rewrite]
+request if ${enableAdBlock} == true && ${url} ~= /(^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads).+?)&ctier=L(&.+?),ctier,(.+)/ as m then url.replace("${m.1}${m.2}${m.3}")
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad/ then reject_img(200)
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/(www|m|s)\.youtube\.com\/api\/stats\/ads/ then reject_dict(200)
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/(www|m|s)\.youtube\.com\/(pagead|ptracking)/ then reject_dict(200)
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/(www|m|s)\.youtube\.com\/api\/stats\/qoe\?adcontext/ then reject_dict(200)
+
+[Script]
+response if ${url} ~= /^https?:\/\/(www|m|tv)\.youtube\.com\/youtubei\/v1\/(player|get_watch)(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/yt-player-enhance.js", {${enableAdBlock}, ${enablePipBg}, ${autoMyanmar}}) with tag="YTPlayerWebMyanmar", requires_body=true, timeout=15
+response if ${url} ~= /^https?:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(player|get_watch)(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/yt-player-enhance.js", {${enableAdBlock}, ${enablePipBg}, ${autoMyanmar}}) with tag="YTPlayerAppMyanmar", requires_body=true, binary_body_mode=true, timeout=15
+request if ${url} ~= /^https?:\/\/(www|m)\.youtube\.com\/api\/timedtext(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/yt-timedtext-dualsub.js", {${subtitleMode}, ${translationMode}, ${autoMyanmar}}) with tag="YTTimedTextRequest", timeout=10
+response if ${url} ~= /^https?:\/\/(www|m)\.youtube\.com\/api\/timedtext(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/yt-timedtext-dualsub.js", {${subtitleMode}, ${translationMode}, ${autoMyanmar}}) with tag="YTTimedTextDualSub", requires_body=true, timeout=25
+
+[Mitm]
+hostname = -redirector*.googlevideo.com, *.googlevideo.com, www.youtube.com, m.youtube.com, tv.youtube.com, youtubei.googleapis.com, s.youtube.com

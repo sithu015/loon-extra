@@ -261,6 +261,7 @@ https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/myanmar-essen
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-auth-proxy.lpx, policy=🇺🇸 United States, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx, enabled=false
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/youtube-myanmar-enhance.lpx, enabled=true
 
 [MITM]
 hostname =

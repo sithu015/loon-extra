@@ -14,6 +14,7 @@ from update_sources import expected_urls, sha256_url
 
 ROOT = Path(__file__).resolve().parent.parent
 REPO_RAW_PREFIX = "https://raw.githubusercontent.com/sithu015/loon-extra/main/"
+REPO_CDN_PREFIX = "https://cdn.jsdelivr.net/gh/sithu015/loon-extra@main/"
 
 REQUIRED_PLUGIN_META = (
     "name",
@@ -296,6 +297,62 @@ def _validate_rewrite_v2(
             report.error(path, line_no, f"Undefined argument `${{{ref}}}` referenced in Rewrite rule")
 
 
+def _check_repo_script_url(
+    path: Path,
+    line_no: int,
+    script_url: str,
+    root: Path,
+    report: ValidationReport,
+) -> None:
+    for prefix in (REPO_RAW_PREFIX, REPO_CDN_PREFIX):
+        if script_url.startswith(prefix):
+            rel = script_url[len(prefix) :]
+            local_script = root / rel
+            if not local_script.is_file():
+                report.error(path, line_no, f"`[Script]` points to missing repo file `{rel}`")
+            break
+
+
+def _validate_script_section(
+    path: Path,
+    line_no: int,
+    line: str,
+    arg_types: dict[str, str],
+    root: Path,
+    report: ValidationReport,
+) -> None:
+    v2 = re.match(r"^(request|response)\s+if\s+(.+?)\s+then\s+script\((.+)\)(?:\s+with\s+(.+))?$", line)
+    if v2:
+        phase, cond, call_args, with_clause = v2.groups()
+        if "${url}" not in cond:
+            report.error(path, line_no, "Script v2 condition must contain `${url}` guard")
+        m_url = re.match(r'^"([^"]+)"', call_args.strip())
+        if not m_url:
+            report.error(path, line_no, "Script v2 `script(...)` must start with a quoted script URL")
+        else:
+            _check_repo_script_url(path, line_no, m_url.group(1), root, report)
+        builtin_vars = {"url", "request.method", "response.status"}
+        for ref in re.findall(r"\$\{([^}]+)\}", line):
+            if ref in builtin_vars or ref.startswith("request.header[") or ref.startswith("response.header["):
+                if phase == "request" and ref.startswith("response."):
+                    report.error(path, line_no, f"Request-phase script cannot reference `${{{ref}}}`")
+                continue
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*\.\d+", ref):
+                continue
+            if ref not in arg_types:
+                report.error(path, line_no, f"Undefined argument `${{{ref}}}` referenced in Script rule")
+        if with_clause:
+            _ = with_clause
+        return
+
+    m_sp = re.search(r"script-path\s*=\s*([^,\s]+)", line)
+    if m_sp:
+        _check_repo_script_url(path, line_no, m_sp.group(1), root, report)
+        return
+
+    report.warn(path, line_no, "Unrecognized `[Script]` entry syntax")
+
+
 def validate_plugin(path: Path, report: ValidationReport, root: Path = ROOT) -> None:
     rel = path.relative_to(root).as_posix()
     lines = _check_text_hygiene(path, path.read_bytes(), report)
@@ -330,6 +387,8 @@ def validate_plugin(path: Path, report: ValidationReport, root: Path = ROOT) -> 
             _validate_rule_line(path, idx, line, "plugin", seen_rules, report)
         elif section == "[rewrite]":
             _validate_rewrite_v2(path, idx, line, args, report)
+        elif section == "[script]":
+            _validate_script_section(path, idx, line, args, root, report)
 
     for key in REQUIRED_PLUGIN_META:
         if not meta.get(key):

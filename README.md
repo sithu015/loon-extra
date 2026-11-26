@@ -3,6 +3,7 @@
   <img src="./assets/icons/squircle/google-ai-auth-proxy.png" width="108" alt="Google AI & Auth Routing Icon" />
   <img src="./assets/icons/squircle/meta-pixel-mitm.png" width="108" alt="Meta Pixel Shield Icon" />
   <img src="./assets/icons/squircle/telemetry-shield.png" width="108" alt="Telemetry Shield Icon" />
+  <img src="./assets/icons/squircle/youtube-myanmar-enhance.png" width="108" alt="YouTube Myanmar & DualSub Icon" />
 </p>
 
 # loon-extra
@@ -23,6 +24,7 @@ All plugins include verified dual `#!source` SHA-256 checksums matching both the
 | **Google AI & Auth Routing**<br>`plugins/google-ai-auth-proxy.lpx` | Routes log-observed Google Auth/Capability endpoints (`securitydomain-pa`, `reach-pa`, `accountcapabilities-pa`) plus Gemini & Antigravity via selectable `PROXY` group | [One-Click Install](loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fsithu015%2Floon-extra%2Fmain%2Fplugins%2Fgoogle-ai-auth-proxy.lpx) | [Raw](https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-auth-proxy.lpx) · [jsDelivr](https://cdn.jsdelivr.net/gh/sithu015/loon-extra@main/plugins/google-ai-auth-proxy.lpx) |
 | **Meta Pixel Shield (MitM)**<br>`plugins/meta-pixel-mitm.lpx` | Dedicated MitM plugin (`hostname = www.facebook.com, facebook.com`) for blocking `facebook.com/tr` and `privacy_sandbox/pixel/` without risking cert-pinning issues in `myanmar-essential.lpx` | [One-Click Install](loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fsithu015%2Floon-extra%2Fmain%2Fplugins%2Fmeta-pixel-mitm.lpx) | [Raw](https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx) · [jsDelivr](https://cdn.jsdelivr.net/gh/sithu015/loon-extra@main/plugins/meta-pixel-mitm.lpx) |
 | **Telemetry & Analytics Shield**<br>`plugins/telemetry-shield.lpx` | Optional cross-app attribution, session replay, and OS telemetry blocker (keeps developer tools like `sentry.io` unblocked) | [One-Click Install](loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fsithu015%2Floon-extra%2Fmain%2Fplugins%2Ftelemetry-shield.lpx) | [Raw](https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx) · [jsDelivr](https://cdn.jsdelivr.net/gh/sithu015/loon-extra@main/plugins/telemetry-shield.lpx) |
+| **YouTube Myanmar & DualSub**<br>`plugins/youtube-myanmar-enhance.lpx` | Unified YouTube AdBlock, PiP & Background Play, Burmese (`my`) subtitle unlock/injection, and Dual Subtitles (`Original + Myanmar`) across `srv3`/`asr`, `json3`, & `WebVTT` with Google Translate fallback | [One-Click Install](loon://import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fsithu015%2Floon-extra%2Fmain%2Fplugins%2Fyoutube-myanmar-enhance.lpx) | [Raw](https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/youtube-myanmar-enhance.lpx) · [jsDelivr](https://cdn.jsdelivr.net/gh/sithu015/loon-extra@main/plugins/youtube-myanmar-enhance.lpx) |
 
 ---
 
@@ -52,6 +54,7 @@ Verified with `printf '%s' '<url>' | shasum -a 256`:
 | `plugins/google-ai-auth-proxy.lpx` | `4df587ff9d7493b735f0776e6a1f756ce63b10c0121361b65c3309308fd1ea50` | `19eceb8771ecd070e17c63509296f92b805147383e1a803af60a61b8560c54c1` |
 | `plugins/meta-pixel-mitm.lpx` | `146d9e0fe8094d4fff8c38815f1f8da9e712c9f094face3d7c54aab5e88a67a5` | `548c6a9234035413550081604d08aab9fb7b447c36480f075635f474b2b8de32` |
 | `plugins/telemetry-shield.lpx` | `593553bc6e23c988bb1d064ef89a9f01d1b32fdac5d256ab69c9940528e865dd` | `dbf2179bce8ee57adb41bb1cdf04eddf4ce72e9053fa8e868089b4a569b240b1` |
+| `plugins/youtube-myanmar-enhance.lpx` | `2e2fd9acba621fcdb6d3dd116499c6aff1c80619bcd347040fa1acc8f5899ed7` | `4a65ff80413c85e866d2a98a3a63e8e36da77bd010a1a2b8cb0b3317d89514a0` |
 
 ---
 
@@ -70,6 +73,7 @@ Verified with `printf '%s' '<url>' | shasum -a 256`:
 2. **Myanmar Essential** plugin ထဲတွင် `PROXY` ကို မိမိအသုံးပြုလိုသည့် Proxy Group (`ShadowShare` သို့မဟုတ် `🇸🇬 Singapore`) သို့ ချိတ်ဆက်ပါ။
 3. မြန်မာဘဏ်များ၊ Wallet App များ (`KBZPay`, `WavePay`, `AYA Pay`, `CB Pay`, `uabpay`, `Yoma` စသည်) နှင့် `.mm` ဝန်ဆောင်မှုများသည် `DIRECT` ဖြင့် တိုက်ရိုက်အလုပ်လုပ်မည်ဖြစ်ပြီး ပြည်တွင်းပိတ်ဆို့ခံ သတင်းမီဒီယာများသည် `PROXY` မှတစ်ဆင့် ဝင်ရောက်နိုင်မည်ဖြစ်သည်။
 4. `Block Meta Pixel (MitM)` သည် HTTPS MitM လိုအပ်သောကြောင့် မူလတွင် `false` ထားရှိထားပါသည်။ လိုအပ်မှသာ ဖွင့်ပါ (သို့မဟုတ် `meta-pixel-mitm.lpx` ကို သီးခြားဖွင့်ပါ)။
+5. **YouTube Myanmar & DualSub** ကို အသုံးပြုရန် macOS/iOS တွင် Loon `[MITM]` CA certificate ကို Install & Full Trust ပြုလုပ်ထားရပါမည်။ Plugin Settings ထဲတွင် `Subtitle Display` (`dual_orig_top` / `dual_my_top` / `my_only`) နှင့် `Translation Engine` (`hybrid` / `google_only` / `youtube_only`) တို့ကို တိုက်ရိုက်ရွေးချယ်နိုင်ပါသည်။
 
 ---
 

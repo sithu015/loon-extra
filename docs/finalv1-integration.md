@@ -12,6 +12,7 @@ https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/myanmar-essen
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-auth-proxy.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=false
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx, enabled=false
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/youtube-myanmar-enhance.lpx, enabled=true
 ```
 
 In Loon's plugin settings UI:
@@ -68,6 +69,9 @@ If you want to tidy up your local `FinalV1_cleaned.lcf` (do **not** commit your 
 7. **Prevent `"User location is not supported for the API use."` (`FAILED_PRECONDITION`) Leaks**:
    - **Close stale pre-VPN `en0` sockets**: If an IDE or background helper (`language_server`) starts while Loon TUN is stopped or restarting, existing persistent TCP connections on `en0` bypass `utun` and keep sending direct local-ISP traffic even after Loon reconnects; restart the client after Loon connects (and enable Loon System Proxy).
    - **Exclude mislabeled non-US / mixed-GeoIP nodes from AI groups**: Verify proxy exit countries (e.g., `ipinfo.io` + Cloudflare `/cdn-cgi/trace`) rather than trusting subscription labels (`🇺🇸`), keep `🤖 AI Services` on verified native-US endpoints (`⚡ US AI (Clean)`), set `udp-fallback-mode = REJECT`, and include `cloudaicompanion.googleapis.com`, `goog`, `withgoogle.com`, and `google.dev` under `🤖 AI Services`.
+8. **YouTube Burmese Dual Subtitles (`youtube-myanmar-enhance.lpx`)**:
+   - Do not enable `youtube.plugin` or `DualSubs.YouTube.plugin` alongside `youtube-myanmar-enhance.lpx`, as multiple `http-response` scripts on `/youtubei/v1/player` conflict.
+   - Ensure Loon's `[MITM]` CA certificate is installed and trusted on macOS/iOS so YouTube player & `/api/timedtext` rewrites run cleanly (`-redirector*.googlevideo.com` stays excluded from MITM so video streams pass through without decryption overhead).
 
 ## 5. Auditing Live Traffic with `tunnelLog`
 
