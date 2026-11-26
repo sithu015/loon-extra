@@ -59,9 +59,9 @@ If you want to tidy up your local `FinalV1_cleaned.lcf` (do **not** commit your 
    - Currently `hostname = *.example.com,-excluded.example.com` and `skip-server-cert-verify = true`.
    - Keep `skip-server-cert-verify = false` in production unless debugging a specific dev host.
    - Keep `facebook.com` out of `[MITM]` unless you intentionally enable `meta-pixel-mitm.lpx` (or `blockMetaPixel = true`), because MitM on Facebook/Messenger can interfere with certificate pinning.
-5. **Trim unreachable DoQ / DoH3 servers observed in `tunnelLog`**:
-   - Live Loon `tunnelLog` inspection showed repeated `[DOQ/NGQUIC]` and `[DOH3/NGHTTP3]` `ERR_HANDSHAKE` / `Query timeout` errors against servers such as `dns.jupitrdns.com`, `dns.surfsharkdns.com`, `dns.quad9.net`, `dns.alidns.com`, and `h3://cloudflare-dns.com/dns-query` on Myanmar networks.
-   - Removing `doq-server` (or keeping only verified reachable DoH endpoints such as `https://1.1.1.1/dns-query,https://dns.google/dns-query`) eliminates thousands of DNS fallback timeouts on `gateway.icloud.com`, `gsp-ssl.ls.apple.com`, and local `.app`/`.mm` domains.
+5. **Trim unreachable DoQ / DoH servers observed in `tunnelLog`**:
+   - Live testing and `tunnelLog` inspection showed repeated failures on `dns.jupitrdns.com`, `dns.surfsharkdns.com`, `ibksturm.synology.me`, `https://dns.alidns.com/dns-query`, `https://doh.pub/dns-query`, `https://dns.mullvad.net/dns-query`, `https://194.242.2.2/dns-query`, and `https://dns.tatacommunications.com/dns-query`.
+   - Keeping only live-verified UDP, DoH (`1.1.1.1`, `1.0.0.1`, `dns.google`, `8.8.8.8`, `8.8.4.4`, `dns.adguard-dns.com`, `doh.opendns.com`, `freedns.controld.com/p0`, `doh.sb`, `dns.quad9.net`), and clean DoQ endpoints gives strong redundancy without DNS handshake timeouts.
 6. **Prevent Google / Gemini Split-IP Mismatch (`IP1 ≠ IP2`)**:
    - In `FinalV1_cleaned.lcf`, `🤖 AI Services` defaults to `🇺🇸 United States` while `🔍 Search & Tech` defaults to `⚡ Auto (All)` (which often selects `🇸🇬 Singapore 12`).
    - Because `gemini.google.com` matches `🤖 AI Services` (`US`) while `www.google.com`, `accounts.google.com`, `googleapis.com`, `gstatic.com`, and `googleusercontent.com` match `🔍 Search & Tech` (`SG`), Google receives requests from two different countries in the same session and rejects or flags the session.
