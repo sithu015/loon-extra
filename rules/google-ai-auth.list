@@ -41,3 +41,6 @@ DOMAIN-SUFFIX,cloudcode-pa.googleapis.com
 DOMAIN-SUFFIX,daily-cloudcode-pa.googleapis.com
 DOMAIN,antigravity-cli-auto-updater-974169037036.us-central1.run.app
 DOMAIN,antigravity-hub-auto-updater-974169037036.us-central1.run.app
+DOMAIN-SUFFIX,goog
+DOMAIN-SUFFIX,withgoogle.com
+DOMAIN-SUFFIX,google.dev

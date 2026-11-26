@@ -28,7 +28,7 @@ disconnect-on-policy-change = false
 sni-sniffing = true
 domain-reject-mode = DNS
 dns-reject-mode = NoAnswer
-udp-fallback-mode = DIRECT
+udp-fallback-mode = REJECT
 
 [Proxy]
 # Add your own nodes or import via [Remote Proxy]
@@ -126,6 +126,10 @@ DOMAIN-SUFFIX,google.com.sg,🤖 AI Services
 DOMAIN-SUFFIX,gstatic.com,🤖 AI Services
 DOMAIN-SUFFIX,googleapis.com,🤖 AI Services
 DOMAIN-SUFFIX,googleusercontent.com,🤖 AI Services
+DOMAIN-SUFFIX,cloudaicompanion.googleapis.com,🤖 AI Services
+DOMAIN-SUFFIX,goog,🤖 AI Services
+DOMAIN-SUFFIX,withgoogle.com,🤖 AI Services
+DOMAIN-SUFFIX,google.dev,🤖 AI Services
 DOMAIN-KEYWORD,openaicom,🤖 AI Services
 DOMAIN-KEYWORD,colab,🤖 AI Services
 

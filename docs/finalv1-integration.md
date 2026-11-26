@@ -65,6 +65,9 @@ If you want to tidy up your local `FinalV1_cleaned.lcf` (do **not** commit your 
 6. **Prevent Google / Gemini & Cloudflare Turnstile Split-IP Mismatches**:
    - **Google / Gemini (`IP1 ≠ IP2`)**: Route `google.com`, `google.com.sg`, `gstatic.com`, `googleapis.com`, `googleusercontent.com` under `🤖 AI Services` (`🇺🇸 United States`) alongside `gemini.google.com` so Google web and auth calls always share one unified exit IP.
    - **Cloudflare Turnstile (`challenges.cloudflare.com` stuck on "Verifying...")**: Keep `🔍 Search & Tech` (which contains `cloudflare.com`) aligned with `ShadowShare` (`⚡ Auto (All)`) so `challenges.cloudflare.com` exits from the exact same node IP as general websites hitting `FINAL,ShadowShare` (such as `coolors.co`).
+7. **Prevent `"User location is not supported for the API use."` (`FAILED_PRECONDITION`) Leaks**:
+   - **Close stale pre-VPN `en0` sockets**: If an IDE or background helper (`language_server`) starts while Loon TUN is stopped or restarting, existing persistent TCP connections on `en0` bypass `utun` and keep sending direct local-ISP traffic even after Loon reconnects; restart the client after Loon connects (and enable Loon System Proxy).
+   - **Exclude mislabeled non-US / mixed-GeoIP nodes from AI groups**: Verify proxy exit countries (e.g., `ipinfo.io` + Cloudflare `/cdn-cgi/trace`) rather than trusting subscription labels (`🇺🇸`), keep `🤖 AI Services` on verified native-US endpoints (`⚡ US AI (Clean)`), set `udp-fallback-mode = REJECT`, and include `cloudaicompanion.googleapis.com`, `goog`, `withgoogle.com`, and `google.dev` under `🤖 AI Services`.
 
 ## 5. Auditing Live Traffic with `tunnelLog`
 
