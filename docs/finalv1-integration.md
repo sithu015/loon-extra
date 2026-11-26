@@ -62,6 +62,10 @@ If you want to tidy up your local `FinalV1_cleaned.lcf` (do **not** commit your 
 5. **Trim unreachable DoQ / DoH3 servers observed in `tunnelLog`**:
    - Live Loon `tunnelLog` inspection showed repeated `[DOQ/NGQUIC]` and `[DOH3/NGHTTP3]` `ERR_HANDSHAKE` / `Query timeout` errors against servers such as `dns.jupitrdns.com`, `dns.surfsharkdns.com`, `dns.quad9.net`, `dns.alidns.com`, and `h3://cloudflare-dns.com/dns-query` on Myanmar networks.
    - Removing `doq-server` (or keeping only verified reachable DoH endpoints such as `https://1.1.1.1/dns-query,https://dns.google/dns-query`) eliminates thousands of DNS fallback timeouts on `gateway.icloud.com`, `gsp-ssl.ls.apple.com`, and local `.app`/`.mm` domains.
+6. **Prevent Google / Gemini Split-IP Mismatch (`IP1 ≠ IP2`)**:
+   - In `FinalV1_cleaned.lcf`, `🤖 AI Services` defaults to `🇺🇸 United States` while `🔍 Search & Tech` defaults to `⚡ Auto (All)` (which often selects `🇸🇬 Singapore 12`).
+   - Because `gemini.google.com` matches `🤖 AI Services` (`US`) while `www.google.com`, `accounts.google.com`, `googleapis.com`, `gstatic.com`, and `googleusercontent.com` match `🔍 Search & Tech` (`SG`), Google receives requests from two different countries in the same session and rejects or flags the session.
+   - **Fix**: Switch `🔍 Search & Tech` in Loon to **`🇺🇸 United States`** (matching `🤖 AI Services`), or route both `🤖 AI Services` and `🔍 Search & Tech` to the exact same region/node. Note that local `[Rule]` entries in `.lcf` override `[Plugin]` rules, so aligning the two policy groups in Loon resolves it immediately.
 
 ## 5. Auditing Live Traffic with `tunnelLog`
 

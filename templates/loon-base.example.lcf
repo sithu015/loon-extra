@@ -45,7 +45,8 @@ ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,�
 🤖 AI Services = select,🇺🇸 United States,🇸🇬 Singapore,🇯🇵 Japan,⚡ Auto (All),ShadowShare,DIRECT
 🎬 Streaming = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
 💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
-🔍 Search & Tech = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,DIRECT
+# Keep 🔍 Search & Tech aligned with 🤖 AI Services (🇺🇸 United States) to prevent Google/Gemini split-IP errors
+🔍 Search & Tech = select,🇺🇸 United States,🇸🇬 Singapore,⚡ Auto (All),DIRECT
 🍎 Apple Services = select,DIRECT,⚡ Auto (All),🇺🇸 United States,ShadowShare
 🛑 AdBlock = select,REJECT,DIRECT
 

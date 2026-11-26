@@ -15,6 +15,10 @@ DOMAIN,oauthaccountmanager.googleapis.com
 DOMAIN,optimizationguide-pa.googleapis.com
 DOMAIN,b1.nel.goog
 DOMAIN,csp.withgoogle.com
+DOMAIN,accounts.google.com
+DOMAIN,apis.google.com
+DOMAIN,ogs.google.com
+DOMAIN-SUFFIX,clients6.google.com
 DOMAIN-SUFFIX,gemini.google.com
 DOMAIN-SUFFIX,gemini.google
 DOMAIN-SUFFIX,bard.google.com

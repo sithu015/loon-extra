@@ -28,6 +28,10 @@ DOMAIN,oauthaccountmanager.googleapis.com,PROXY
 DOMAIN,optimizationguide-pa.googleapis.com,PROXY
 DOMAIN,b1.nel.goog,PROXY
 DOMAIN,csp.withgoogle.com,PROXY
+DOMAIN,accounts.google.com,PROXY
+DOMAIN,apis.google.com,PROXY
+DOMAIN,ogs.google.com,PROXY
+DOMAIN-SUFFIX,clients6.google.com,PROXY
 
 # ==============================================================================
 # 2. Google Gemini & Antigravity Endpoints
