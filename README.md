@@ -34,6 +34,7 @@ Because Loon plugins only support `DIRECT`, `PROXY`, and `REJECT*`, standalone `
 | `rules/adblock-extra.list` | `🛑 AdBlock` | `https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/adblock-extra.list` |
 | `rules/apple-fallback.list` | `DIRECT` / `🍎 Apple Services` | `https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/apple-fallback.list` |
 | `rules/google-ai-auth.list` | `⚡ US Auto` / `🤖 AI Services` | `https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/google-ai-auth.list` |
+| `rules/ai-extra.list` | `🤖 AI Services` | `https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/ai-extra.list` |
 | `rules/telemetry-shield.list` | `🛑 AdBlock` | `https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/telemetry-shield.list` |
 
 ---
@@ -68,9 +69,12 @@ Verified with `printf '%s' '<url>' | shasum -a 256`:
 
 ---
 
-## Development & Validation
+## Development, Log Auditing & Validation
 
 ```bash
+# Audit real connected domains/URLs and DNS errors from macOS Loon tunnelLog
+python3 scripts/analyze_tunnel_log.py --latest --redact-query
+
 # Re-generate icons (optional)
 python3 scripts/generate_icons.py
 

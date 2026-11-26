@@ -23,6 +23,11 @@ DOMAIN,aisandbox-pa.googleapis.com,PROXY
 DOMAIN,robinfrontend-pa.googleapis.com,PROXY
 DOMAIN-SUFFIX,geller-pa.googleapis.com,PROXY
 DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,PROXY
+DOMAIN,jetski-webchannel.googleapis.com,PROXY
+DOMAIN,oauthaccountmanager.googleapis.com,PROXY
+DOMAIN,optimizationguide-pa.googleapis.com,PROXY
+DOMAIN,b1.nel.goog,PROXY
+DOMAIN,csp.withgoogle.com,PROXY
 
 # ==============================================================================
 # 2. Google Gemini & Antigravity Endpoints
@@ -47,3 +52,5 @@ DOMAIN,antigravity-unleash.goog,PROXY
 DOMAIN,aicode.googleapis.com,PROXY
 DOMAIN-SUFFIX,cloudcode-pa.googleapis.com,PROXY
 DOMAIN-SUFFIX,daily-cloudcode-pa.googleapis.com,PROXY
+DOMAIN,antigravity-cli-auto-updater-974169037036.us-central1.run.app,PROXY
+DOMAIN,antigravity-hub-auto-updater-974169037036.us-central1.run.app,PROXY

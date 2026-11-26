@@ -5,11 +5,10 @@
 # ==============================================================================
 
 [General]
-doq-server = quic://dns.adguard-dns.com,quic://dns.alidns.com:853,quic://dns.caliph.dev:853,quic://dns.comss.one,quic://dns.dnsguard.pub,quic://dns.jupitrdns.com,quic://dns.surfsharkdns.com,quic://doh.tiar.app,quic://doq.ffmuc.net,quic://family.adguard-dns.com,quic://ibksturm.synology.me
 skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local
 bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32
 dns-server = system,1.1.1.1,8.8.8.8,9.9.9.9
-doh-server = https://1.1.1.1/dns-query,https://dns.mullvad.net/dns-query,https://194.242.2.2/dns-query,https://doh.sb/dns-query,https://dns.controld.com/dns-query,https://dns.alidns.com/dns-query,https://doh.pub/dns-query
+doh-server = https://1.1.1.1/dns-query,https://dns.google/dns-query
 hijack-dns = *:53
 ip-mode = dual
 ipv6-vif = auto
@@ -98,6 +97,7 @@ DOMAIN-SUFFIX,mistral.ai,🤖 AI Services
 DOMAIN-SUFFIX,poe.com,🤖 AI Services
 DOMAIN-SUFFIX,groq.com,🤖 AI Services
 DOMAIN-SUFFIX,deepseek.com,🤖 AI Services
+DOMAIN-SUFFIX,deepl.com,🤖 AI Services
 DOMAIN-SUFFIX,huggingface.co,🤖 AI Services
 DOMAIN-SUFFIX,gemini.google.com,🤖 AI Services
 DOMAIN-SUFFIX,bard.google.com,🤖 AI Services
@@ -168,6 +168,8 @@ DOMAIN-SUFFIX,tiktok.com,💬 Social Media
 DOMAIN-SUFFIX,tiktokcdn.com,💬 Social Media
 DOMAIN-SUFFIX,byteoversea.com,💬 Social Media
 DOMAIN-SUFFIX,signal.org,💬 Social Media
+DOMAIN-SUFFIX,viber.com,💬 Social Media
+DOMAIN-SUFFIX,viberlab.com,💬 Social Media
 
 # --- Search & Tech ---
 DOMAIN-SUFFIX,google.com,🔍 Search & Tech
@@ -206,6 +208,7 @@ FINAL,ShadowShare
 
 [Remote Rule]
 https://raw.githubusercontent.com/sithu015/loon-rules/main/AI.list, policy=🤖 AI Services, tag=AI Services (loon-rules), enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/ai-extra.list, policy=🤖 AI Services, tag=AI Extra (loon-extra), enabled=true
 https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/loon/global.list, policy=⚡ Auto (All), tag=global.list, enabled=true
 
 [Rewrite]

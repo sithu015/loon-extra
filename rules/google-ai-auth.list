@@ -10,6 +10,11 @@ DOMAIN,aisandbox-pa.googleapis.com
 DOMAIN,robinfrontend-pa.googleapis.com
 DOMAIN-SUFFIX,geller-pa.googleapis.com
 DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
+DOMAIN,jetski-webchannel.googleapis.com
+DOMAIN,oauthaccountmanager.googleapis.com
+DOMAIN,optimizationguide-pa.googleapis.com
+DOMAIN,b1.nel.goog
+DOMAIN,csp.withgoogle.com
 DOMAIN-SUFFIX,gemini.google.com
 DOMAIN-SUFFIX,gemini.google
 DOMAIN-SUFFIX,bard.google.com
@@ -30,3 +35,5 @@ DOMAIN,antigravity-unleash.goog
 DOMAIN,aicode.googleapis.com
 DOMAIN-SUFFIX,cloudcode-pa.googleapis.com
 DOMAIN-SUFFIX,daily-cloudcode-pa.googleapis.com
+DOMAIN,antigravity-cli-auto-updater-974169037036.us-central1.run.app
+DOMAIN,antigravity-hub-auto-updater-974169037036.us-central1.run.app

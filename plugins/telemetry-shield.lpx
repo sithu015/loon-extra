@@ -24,6 +24,12 @@ DOMAIN-SUFFIX,segment.io,REJECT
 DOMAIN-SUFFIX,segment.com,REJECT
 DOMAIN-SUFFIX,onesignal.com,REJECT
 DOMAIN-SUFFIX,clevertap-prod.com,REJECT
+DOMAIN-SUFFIX,i.posthog.com,REJECT
+DOMAIN-SUFFIX,featureassets.org,REJECT
+DOMAIN-SUFFIX,eppo.cloud,REJECT
+DOMAIN-SUFFIX,data-event-proxy.viber.com,REJECT
+DOMAIN-SUFFIX,data-events.cdn.viber.com,REJECT
+DOMAIN-SUFFIX,abtest.api.viber.com,REJECT
 
 # --- Web Session Replay, Telemetry & Heatmaps ---
 DOMAIN-SUFFIX,hotjar.com,REJECT
@@ -42,3 +48,4 @@ DOMAIN-SUFFIX,ads-img.mozilla.org,REJECT
 DOMAIN-SUFFIX,mobile.events.data.microsoft.com,REJECT
 DOMAIN-SUFFIX,vortex.data.microsoft.com,REJECT
 DOMAIN-SUFFIX,gvt2.com,REJECT
+DOMAIN-SUFFIX,gvt3.com,REJECT

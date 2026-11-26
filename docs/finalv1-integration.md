@@ -29,6 +29,7 @@ https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/myanmar-direct.
 https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/myanmar-media-proxy.list, policy=ShadowShare, tag=Myanmar Media, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/adblock-extra.list, policy=🛑 AdBlock, tag=AdBlock Extra, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/google-ai-auth.list, policy=⚡ US Auto, tag=Google AI & Auth, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/ai-extra.list, policy=🤖 AI Services, tag=AI Extra, enabled=true
 ```
 
 ## 3. Rule Precedence in Loon 3.5.1+
@@ -58,8 +59,19 @@ If you want to tidy up your local `FinalV1_cleaned.lcf` (do **not** commit your 
    - Currently `hostname = *.example.com,-excluded.example.com` and `skip-server-cert-verify = true`.
    - Keep `skip-server-cert-verify = false` in production unless debugging a specific dev host.
    - Keep `facebook.com` out of `[MITM]` unless you intentionally enable `meta-pixel-mitm.lpx` (or `blockMetaPixel = true`), because MitM on Facebook/Messenger can interfere with certificate pinning.
+5. **Trim unreachable DoQ / DoH3 servers observed in `tunnelLog`**:
+   - Live Loon `tunnelLog` inspection showed repeated `[DOQ/NGQUIC]` and `[DOH3/NGHTTP3]` `ERR_HANDSHAKE` / `Query timeout` errors against servers such as `dns.jupitrdns.com`, `dns.surfsharkdns.com`, `dns.quad9.net`, `dns.alidns.com`, and `h3://cloudflare-dns.com/dns-query` on Myanmar networks.
+   - Removing `doq-server` (or keeping only verified reachable DoH endpoints such as `https://1.1.1.1/dns-query,https://dns.google/dns-query`) eliminates thousands of DNS fallback timeouts on `gateway.icloud.com`, `gsp-ssl.ls.apple.com`, and local `.app`/`.mm` domains.
 
-## 5. Security Reminder
+## 5. Auditing Live Traffic with `tunnelLog`
+
+On macOS, Loon records real connection matches, HTTP URLs, and DNS warnings under `/Library/Application Support/com.loon.Loon/tunnelLog/`. You can audit live traffic coverage against this repository anytime:
+
+```bash
+python3 scripts/analyze_tunnel_log.py --latest --redact-query
+```
+
+## 6. Security Reminder
 
 Never push your local `.lcf` file containing:
 - `[Proxy]` Shadowsocks / VMess / VLESS server passwords or UUIDs

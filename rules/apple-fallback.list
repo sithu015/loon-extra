@@ -1,6 +1,11 @@
 # ==============================================================================
-# Apple Services Fallback Fixes (Log-Observed)
+# Apple Services & CDN Fallback Fixes (Log-Observed)
 # Recommended Remote Rule Policy: DIRECT (or 🍎 Apple Services)
 # ==============================================================================
 DOMAIN,c.apple.news
 DOMAIN,cdn.apple-mapkit.com
+DOMAIN-SUFFIX,cdn-apple.com
+DOMAIN-SUFFIX,edge.apple
+DOMAIN-SUFFIX,safebrowsing.apple
+IP-CIDR,17.0.0.0/8,no-resolve
+IP-CIDR6,2620:149::/32,no-resolve

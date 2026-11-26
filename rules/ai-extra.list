@@ -1,0 +1,12 @@
+# ==============================================================================
+# AI Translation & Additional LLM Services (Log-Observed)
+# Recommended Remote Rule Policy: 🤖 AI Services (or ⚡ US Auto)
+# ==============================================================================
+DOMAIN-SUFFIX,deepl.com
+DOMAIN-SUFFIX,immersivetranslate.com
+DOMAIN-SUFFIX,getwabi.ai
+DOMAIN-SUFFIX,wabi.ai
+DOMAIN-SUFFIX,arena.ai
+DOMAIN-SUFFIX,e2llm.com
+DOMAIN-SUFFIX,hyper.ai
+DOMAIN-SUFFIX,suzhe.ai

@@ -16,10 +16,15 @@ blockMetaPixel = switch,false,type=boolean,tag=Block Meta Pixel (MitM),desc=Requ
 
 [Rule]
 # ==============================================================================
-# 1. Apple Services Fallback Fixes (Log-Observed)
+# 1. Apple Services & CDN Fallback Fixes (Log-Observed)
 # ==============================================================================
 DOMAIN,c.apple.news,DIRECT
 DOMAIN,cdn.apple-mapkit.com,DIRECT
+DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+DOMAIN-SUFFIX,edge.apple,DIRECT
+DOMAIN-SUFFIX,safebrowsing.apple,DIRECT
+IP-CIDR,17.0.0.0/8,DIRECT,no-resolve
+IP-CIDR6,2620:149::/32,DIRECT,no-resolve
 
 # ==============================================================================
 # 2. Myanmar Banks & Mobile Payment Apps (DIRECT — Geo-Block & Pinning Safe)
@@ -44,6 +49,7 @@ DOMAIN-SUFFIX,onepay.com.mm,DIRECT
 DOMAIN-SUFFIX,mcb.com.mm,DIRECT
 DOMAIN-SUFFIX,okdollar.com,DIRECT
 DOMAIN-SUFFIX,truemoney.com.mm,DIRECT
+DOMAIN-SUFFIX,momopaymm.com,DIRECT
 
 # ==============================================================================
 # 3. Myanmar Telecoms & ISPs (DIRECT)
@@ -133,6 +139,10 @@ DOMAIN-SUFFIX,analytics.tiktok.com,REJECT
 DOMAIN-SUFFIX,clarity.ms,REJECT
 DOMAIN-SUFFIX,bat.bing.com,REJECT
 DOMAIN-SUFFIX,appsflyersdk.com,REJECT
+DOMAIN-SUFFIX,singular.net,REJECT
+DOMAIN-SUFFIX,servedbyadbutler.com,REJECT
+DOMAIN-SUFFIX,analytics.ahrefs.com,REJECT
+DOMAIN-SUFFIX,static.cloudflareinsights.com,REJECT
 
 [Rewrite]
 # Optional Loon 3.5.1+ Rewrite v2 rule for Meta Pixel tracking endpoint

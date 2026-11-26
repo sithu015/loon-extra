@@ -13,6 +13,12 @@ DOMAIN-SUFFIX,segment.io
 DOMAIN-SUFFIX,segment.com
 DOMAIN-SUFFIX,onesignal.com
 DOMAIN-SUFFIX,clevertap-prod.com
+DOMAIN-SUFFIX,i.posthog.com
+DOMAIN-SUFFIX,featureassets.org
+DOMAIN-SUFFIX,eppo.cloud
+DOMAIN-SUFFIX,data-event-proxy.viber.com
+DOMAIN-SUFFIX,data-events.cdn.viber.com
+DOMAIN-SUFFIX,abtest.api.viber.com
 DOMAIN-SUFFIX,hotjar.com
 DOMAIN-SUFFIX,hotjar.io
 DOMAIN-SUFFIX,fullstory.com
@@ -27,3 +33,4 @@ DOMAIN-SUFFIX,ads-img.mozilla.org
 DOMAIN-SUFFIX,mobile.events.data.microsoft.com
 DOMAIN-SUFFIX,vortex.data.microsoft.com
 DOMAIN-SUFFIX,gvt2.com
+DOMAIN-SUFFIX,gvt3.com
