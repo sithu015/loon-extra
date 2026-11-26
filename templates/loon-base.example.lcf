@@ -61,6 +61,11 @@ ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,�
 [Proxy Chain]
 
 [Rule]
+# --- Google Auth/Capability Fixes ---
+DOMAIN,securitydomain-pa.googleapis.com,🇺🇸 United States
+DOMAIN,reach-pa.googleapis.com,🇺🇸 United States
+DOMAIN,accountcapabilities-pa.googleapis.com,🇺🇸 United States
+
 # --- Local & Private Network ---
 IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
 IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
@@ -68,6 +73,8 @@ IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
 IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
 IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
 IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+DOMAIN-SUFFIX,ygn.app,DIRECT
+DOMAIN-SUFFIX,readfrog.app,DIRECT
 
 # --- Advertising & Tracking ---
 DOMAIN-KEYWORD,adservice,🛑 AdBlock
@@ -81,13 +88,15 @@ DOMAIN-SUFFIX,vungle.com,🛑 AdBlock
 DOMAIN-SUFFIX,appsflyer.com,🛑 AdBlock
 DOMAIN-SUFFIX,adjust.com,🛑 AdBlock
 
-# --- AI Services ---
+# --- AI Services (OpenAI, Claude, Gemini, Antigravity, DeepL, Perplexity, etc.) ---
 DOMAIN-SUFFIX,openai.com,🤖 AI Services
 DOMAIN-SUFFIX,chatgpt.com,🤖 AI Services
 DOMAIN-SUFFIX,oaistatic.com,🤖 AI Services
 DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI Services
 DOMAIN-SUFFIX,anthropic.com,🤖 AI Services
 DOMAIN-SUFFIX,claude.ai,🤖 AI Services
+DOMAIN-SUFFIX,claude.com,🤖 AI Services
+DOMAIN-SUFFIX,claudeusercontent.com,🤖 AI Services
 DOMAIN-SUFFIX,perplexity.ai,🤖 AI Services
 DOMAIN-SUFFIX,cursor.sh,🤖 AI Services
 DOMAIN-SUFFIX,cursor.com,🤖 AI Services
@@ -102,9 +111,15 @@ DOMAIN-SUFFIX,deepseek.com,🤖 AI Services
 DOMAIN-SUFFIX,deepl.com,🤖 AI Services
 DOMAIN-SUFFIX,huggingface.co,🤖 AI Services
 DOMAIN-SUFFIX,gemini.google.com,🤖 AI Services
+DOMAIN-SUFFIX,gemini.google,🤖 AI Services
 DOMAIN-SUFFIX,bard.google.com,🤖 AI Services
+DOMAIN-SUFFIX,aistudio.google.com,🤖 AI Services
 DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 AI Services
 DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,🤖 AI Services
+DOMAIN-SUFFIX,antigravity.google,🤖 AI Services
+DOMAIN-SUFFIX,antigravity.google.com,🤖 AI Services
+DOMAIN-SUFFIX,cloudcode-pa.googleapis.com,🤖 AI Services
+DOMAIN-SUFFIX,daily-cloudcode-pa.googleapis.com,🤖 AI Services
 DOMAIN-KEYWORD,openaicom,🤖 AI Services
 DOMAIN-KEYWORD,colab,🤖 AI Services
 
@@ -194,6 +209,18 @@ DOMAIN-SUFFIX,cloudflare.com,🔍 Search & Tech
 DOMAIN-SUFFIX,gitlab.com,🔍 Search & Tech
 DOMAIN-SUFFIX,stackexchange.com,🔍 Search & Tech
 DOMAIN-SUFFIX,stackoverflow.com,🔍 Search & Tech
+DOMAIN-SUFFIX,1password.com,🔍 Search & Tech
+DOMAIN-SUFFIX,agilebits.com,🔍 Search & Tech
+DOMAIN-SUFFIX,npmjs.org,🔍 Search & Tech
+DOMAIN-SUFFIX,pypi.org,🔍 Search & Tech
+DOMAIN-SUFFIX,pythonhosted.org,🔍 Search & Tech
+DOMAIN-SUFFIX,vercel.com,🔍 Search & Tech
+DOMAIN-SUFFIX,amazonaws.com,🔍 Search & Tech
+DOMAIN-SUFFIX,boxd.sh,🔍 Search & Tech
+DOMAIN-SUFFIX,agentcall.co,🔍 Search & Tech
+DOMAIN-SUFFIX,mobbin.com,🔍 Search & Tech
+DOMAIN-SUFFIX,qd.je,🔍 Search & Tech
+DOMAIN-SUFFIX,zed.dev,🔍 Search & Tech
 
 # --- Apple Services ---
 DOMAIN-SUFFIX,apple.com,🍎 Apple Services
@@ -204,6 +231,9 @@ DOMAIN-SUFFIX,apple-cloudkit.com,🍎 Apple Services
 DOMAIN-SUFFIX,aaplimg.com,🍎 Apple Services
 DOMAIN-SUFFIX,apple-dns.net,🍎 Apple Services
 DOMAIN-SUFFIX,itunes.com,🍎 Apple Services
+DOMAIN-SUFFIX,cdn-apple.com,🍎 Apple Services
+DOMAIN-SUFFIX,edge.apple,🍎 Apple Services
+DOMAIN-SUFFIX,safebrowsing.apple,🍎 Apple Services
 
 # --- Fallback Rule ---
 FINAL,ShadowShare
@@ -211,7 +241,7 @@ FINAL,ShadowShare
 [Remote Rule]
 https://raw.githubusercontent.com/sithu015/loon-rules/main/AI.list, policy=🤖 AI Services, tag=AI Services (loon-rules), enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/rules/ai-extra.list, policy=🤖 AI Services, tag=AI Extra (loon-extra), enabled=true
-https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/loon/global.list, policy=⚡ Auto (All), tag=global.list, enabled=true
+https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/loon/global.list, policy=🇺🇸 United States, tag=global.list, enabled=true
 
 [Rewrite]
 
@@ -222,9 +252,9 @@ https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/loon/global.list,
 [Remote Script]
 
 [Plugin]
-https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/myanmar-essential.lpx, enabled=true
-https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-auth-proxy.lpx, enabled=true
-https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=false
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/myanmar-essential.lpx, policy=⚡ Auto (All), enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-auth-proxy.lpx, policy=🇺🇸 United States, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx, enabled=false
 
 [MITM]
