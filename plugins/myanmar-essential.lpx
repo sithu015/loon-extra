@@ -120,6 +120,49 @@ DOMAIN-SUFFIX,shannews.org,PROXY
 DOMAIN-SUFFIX,myitkyinanewsjournal.com,PROXY
 DOMAIN-SUFFIX,ktimes.org,PROXY
 DOMAIN-SUFFIX,bnionline.net,PROXY
+DOMAIN-SUFFIX,monnews.org,PROXY
+DOMAIN-SUFFIX,kachinnews.com,PROXY
+DOMAIN-SUFFIX,khonumthung.org,PROXY
+DOMAIN-SUFFIX,karennews.org,PROXY
+DOMAIN-SUFFIX,nmg-news.com,PROXY
+DOMAIN-SUFFIX,thanlwintimes.com,PROXY
+DOMAIN-SUFFIX,ludunwayoo.com,PROXY
+DOMAIN-SUFFIX,myaelattathan.org,PROXY
+DOMAIN-SUFFIX,tachileik.net,PROXY
+DOMAIN-SUFFIX,thithtoolwin.com,PROXY
+DOMAIN-SUFFIX,myanmargazette.net,PROXY
+DOMAIN-SUFFIX,kaladanpress.com,PROXY
+DOMAIN-SUFFIX,mmpeacemonitor.org,PROXY
+DOMAIN-SUFFIX,aappb.org,PROXY
+DOMAIN-SUFFIX,khrg.org,PROXY
+DOMAIN-SUFFIX,chinhumanrights.org,PROXY
+DOMAIN-SUFFIX,nd-burma.org,PROXY
+DOMAIN-SUFFIX,equalitymyanmar.org,PROXY
+DOMAIN-SUFFIX,earthrights.org,PROXY
+DOMAIN-SUFFIX,freeburmarangers.org,PROXY
+DOMAIN-SUFFIX,burmacampaign.org.uk,PROXY
+DOMAIN-SUFFIX,altsean.org,PROXY
+DOMAIN-SUFFIX,womenofburma.org,PROXY
+DOMAIN-SUFFIX,nugmyanmar.org,PROXY
+DOMAIN-SUFFIX,pvtvmyanmar.com,PROXY
+
+# ==============================================================================
+# 6b. Circumvention, VPN & Censorship Monitoring Tools (PROXY — Blocked in MM)
+# ==============================================================================
+DOMAIN-SUFFIX,proton.me,PROXY
+DOMAIN-SUFFIX,protonvpn.com,PROXY
+DOMAIN-SUFFIX,protonmail.com,PROXY
+DOMAIN-SUFFIX,psiphon.ca,PROXY
+DOMAIN-SUFFIX,psiphon3.com,PROXY
+DOMAIN-SUFFIX,torproject.org,PROXY
+DOMAIN-SUFFIX,nordvpn.com,PROXY
+DOMAIN-SUFFIX,expressvpn.com,PROXY
+DOMAIN-SUFFIX,mullvad.net,PROXY
+DOMAIN-SUFFIX,surfshark.com,PROXY
+DOMAIN-SUFFIX,windscribe.com,PROXY
+DOMAIN-SUFFIX,outline.org,PROXY
+DOMAIN-SUFFIX,getoutline.org,PROXY
+DOMAIN-SUFFIX,ooni.org,PROXY
 
 # ==============================================================================
 # 7. Additional Ad Networks & Trackers (REJECT — Complements FinalV1.lcf)

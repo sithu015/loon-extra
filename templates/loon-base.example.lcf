@@ -45,7 +45,7 @@ udp-fallback-mode = REJECT
 ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,DIRECT
 🤖 AI Services = select,🇺🇸 United States,🇸🇬 Singapore,🇯🇵 Japan,⚡ Auto (All),ShadowShare,DIRECT
 🎬 Streaming = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
-💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
+💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare
 # Keep 🔍 Search & Tech aligned with ShadowShare (⚡ Auto (All)) so Cloudflare Turnstile (challenges.cloudflare.com) shares the same exit IP as general websites
 🔍 Search & Tech = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,DIRECT
 🍎 Apple Services = select,DIRECT,⚡ Auto (All),🇺🇸 United States,ShadowShare
@@ -178,13 +178,34 @@ DOMAIN-SUFFIX,x.com,💬 Social Media
 DOMAIN-SUFFIX,twimg.com,💬 Social Media
 DOMAIN-SUFFIX,t.co,💬 Social Media
 DOMAIN-SUFFIX,facebook.com,💬 Social Media
+DOMAIN-SUFFIX,fb.com,💬 Social Media
+DOMAIN-SUFFIX,fb.me,💬 Social Media
+DOMAIN-SUFFIX,fb.watch,💬 Social Media
+DOMAIN-SUFFIX,fb.gg,💬 Social Media
 DOMAIN-SUFFIX,fbcdn.net,💬 Social Media
+DOMAIN-SUFFIX,fbcdn.com,💬 Social Media
 DOMAIN-SUFFIX,fbsbx.com,💬 Social Media
+DOMAIN-SUFFIX,messenger.com,💬 Social Media
+DOMAIN-SUFFIX,m.me,💬 Social Media
+DOMAIN-SUFFIX,meta.com,💬 Social Media
 DOMAIN-SUFFIX,instagram.com,💬 Social Media
 DOMAIN-SUFFIX,cdninstagram.com,💬 Social Media
+DOMAIN-SUFFIX,ig.me,💬 Social Media
 DOMAIN-SUFFIX,threads.net,💬 Social Media
 DOMAIN-SUFFIX,whatsapp.com,💬 Social Media
 DOMAIN-SUFFIX,whatsapp.net,💬 Social Media
+DOMAIN-SUFFIX,wa.me,💬 Social Media
+IP-CIDR,31.13.24.0/21,💬 Social Media,no-resolve
+IP-CIDR,31.13.64.0/18,💬 Social Media,no-resolve
+IP-CIDR,66.220.144.0/20,💬 Social Media,no-resolve
+IP-CIDR,69.63.176.0/20,💬 Social Media,no-resolve
+IP-CIDR,69.171.224.0/19,💬 Social Media,no-resolve
+IP-CIDR,129.134.0.0/17,💬 Social Media,no-resolve
+IP-CIDR,157.240.0.0/16,💬 Social Media,no-resolve
+IP-CIDR,179.60.192.0/22,💬 Social Media,no-resolve
+IP-CIDR,185.60.216.0/22,💬 Social Media,no-resolve
+IP-CIDR,199.201.64.0/22,💬 Social Media,no-resolve
+IP-CIDR,204.15.20.0/22,💬 Social Media,no-resolve
 DOMAIN-SUFFIX,reddit.com,💬 Social Media
 DOMAIN-SUFFIX,redditmedia.com,💬 Social Media
 DOMAIN-SUFFIX,redd.it,💬 Social Media
@@ -193,8 +214,10 @@ DOMAIN-SUFFIX,discordapp.com,💬 Social Media
 DOMAIN-SUFFIX,discord.gg,💬 Social Media
 DOMAIN-SUFFIX,tiktok.com,💬 Social Media
 DOMAIN-SUFFIX,tiktokcdn.com,💬 Social Media
+DOMAIN-SUFFIX,tiktokv.com,💬 Social Media
 DOMAIN-SUFFIX,byteoversea.com,💬 Social Media
 DOMAIN-SUFFIX,signal.org,💬 Social Media
+DOMAIN-SUFFIX,whispersystems.org,💬 Social Media
 DOMAIN-SUFFIX,viber.com,💬 Social Media
 DOMAIN-SUFFIX,viberlab.com,💬 Social Media
 
