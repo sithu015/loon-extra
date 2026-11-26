@@ -1,0 +1,15 @@
+#!name = Media Checker (Streaming ဝန်ဆောင်မှု စစ်ဆေးရန်)
+#!desc = Proxy Node မှ Netflix, YouTube Premium, Disney+, Paramount+, Discovery+ နှင့် DAZN တို့ Unlock ဖြစ်မဖြစ် စစ်ဆေးပေးသည့် Loon Plugin
+#!author = sithu015 (Localized from deezertidal / KOP-XIAO)
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/media-checker.png
+#!source = 0a662fd484a727921113c91ff3efc37e674bd8985575ee180923104a64dff549, 37b96102c7424466693c5b1932245f6785ff75a854d69b18187c780199d60959
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = Diagnostic,Streaming,Myanmar
+#!type = normal
+
+[Script]
+generic script-path=https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/media-checker.js, tag=Streaming Unlock စစ်ဆေးရန် (Media Checker), timeout=15

@@ -262,6 +262,9 @@ https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-aut
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx, enabled=false
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/youtube-myanmar-enhance.lpx, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/node-link-check.lpx, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/geo-location.lpx, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/media-checker.lpx, enabled=true
 
 [MITM]
 hostname =

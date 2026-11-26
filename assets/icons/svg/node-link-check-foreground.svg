@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+
+  </defs>
+  <g id="foreground">
+    <line x1="302" y1="602" x2="512" y2="372" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.7"/><line x1="512" y1="372" x2="722" y2="602" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.7"/><circle cx="302" cy="602" r="74" fill="#FFFFFF"/><circle cx="512" cy="372" r="82" fill="#FFFFFF"/><circle cx="722" cy="602" r="74" fill="#FFFFFF"/>
+  </g>
+</svg>

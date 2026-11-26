@@ -1,0 +1,15 @@
+#!name = GeoLocation (Node IP နှင့် နိုင်ငံ စစ်ဆေးရန်)
+#!desc = Proxy Node တစ်ခုချင်းစီ၏ လက်ရှိ Exit IP၊ နိုင်ငံ၊ မြို့၊ ISP နှင့် ASN အချက်အလက်များကို စစ်ဆေးပေးသည့် Loon Plugin
+#!author = sithu015 (Localized from deezertidal)
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/geo-location.png
+#!source = 73581bd9e25443865e54324d201c7ef52e124217df0b4403f9a1d78ed144b16b, 237da941f9e9a8fbd610aa024711c21552a1099c617b217ba720ec25d348c40d
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = Diagnostic,GeoIP,Myanmar
+#!type = normal
+
+[Script]
+generic script-path=https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/geo-location.js, tag=Node IP စစ်ဆေးရန် (GeoLocation), timeout=10

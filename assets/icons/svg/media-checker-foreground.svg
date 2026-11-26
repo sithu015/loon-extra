@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+<mask id="media-cut">
+  <rect width="1024" height="1024" fill="white"/>
+  <path d="M 402 522 L 488 608 L 640 434" fill="none" stroke="black" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>
+</mask>
+  </defs>
+  <g id="foreground">
+    <rect x="252" y="326" width="520" height="372" rx="56" fill="#FFFFFF" mask="url(#media-cut)"/>
+  </g>
+</svg>

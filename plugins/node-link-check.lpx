@@ -1,0 +1,15 @@
+#!name = Node Link Check (Proxy လမ်းကြောင်း စစ်ဆေးရန်)
+#!desc = Proxy Node ၏ ဝင်ပေါက်မှ ထွက်ပေါက်အထိ ချိတ်ဆက်မှုလမ်းကြောင်း (Entry -> Exit IP / Relay) ကို စစ်ဆေးပေးသည့် Loon Plugin
+#!author = sithu015 (Localized from I-am-R-E)
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/node-link-check.png
+#!source = f84a7be98c48d06a811c069b287aaf0bea904d4f1f595449961f648b89fb7940, da24cdad21be5a67a6e5c15f9fc1c642066dfe7afbeee000c729bd293f25d8d4
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = Diagnostic,Proxy,Myanmar
+#!type = normal
+
+[Script]
+generic script-path=https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/node-link-check.js, tag=Proxy လမ်းကြောင်း စစ်ဆေးရန် (Node Link Check), timeout=15

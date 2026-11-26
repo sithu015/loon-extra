@@ -764,6 +764,37 @@ def _render_icon(
                         if b2_a > 0.0:
                             col = _blend_rgb(col, gold, b2_a * 0.98)
 
+                elif motif == "linkcheck":
+                    d_l1 = _sd_segment(px, py, -210.0, 90.0, 0.0, -140.0) - 24.0
+                    d_l2 = _sd_segment(px, py, 0.0, -140.0, 210.0, 90.0) - 24.0
+                    l_a = 1.0 - _smoothstep(-1.1, 1.1, min(d_l1, d_l2))
+                    if l_a > 0.0:
+                        col = _blend_rgb(col, white, l_a * 0.65)
+                    for cx, cy, cr, accent in ((-210.0, 90.0, 74.0, white), (0.0, -140.0, 82.0, mint), (210.0, 90.0, 74.0, white)):
+                        na = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px - cx, py - cy, cr))
+                        if na > 0.0:
+                            col = _blend_rgb(col, accent, na * 0.96)
+
+                elif motif == "geo":
+                    d_ring = _sd_ring(px, py, 240.0, 26.0)
+                    d_eq = _sd_rounded_box(px, py, 240.0, 18.0, 10.0)
+                    d_mer = _sd_rounded_box(px, py, 18.0, 240.0, 10.0)
+                    ga = 1.0 - _smoothstep(-1.1, 1.1, min(d_ring, d_eq, d_mer))
+                    if ga > 0.0:
+                        col = _blend_rgb(col, white, ga * 0.92)
+                    ca = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px, py, 64.0))
+                    if ca > 0.0:
+                        col = _blend_rgb(col, mint, ca * 0.98)
+
+                elif motif == "media":
+                    if abs(px) <= 290.0 and abs(py) <= 230.0:
+                        d_box = _sd_rounded_box(px, py, 260.0, 186.0, 56.0)
+                        d_c1 = _sd_segment(px, py, -110.0, 10.0, -24.0, 96.0) - 30.0
+                        d_c2 = _sd_segment(px, py, -24.0, 96.0, 128.0, -78.0) - 30.0
+                        ma = 1.0 - _smoothstep(-1.1, 1.1, max(d_box, -min(d_c1, d_c2)))
+                        if ma > 0.0:
+                            col = _blend_rgb(col, white, ma * 0.96)
+
             r8 = int(round(_clamp(col[0]) * 255))
             g8 = int(round(_clamp(col[1]) * 255))
             b8 = int(round(_clamp(col[2]) * 255))
@@ -925,6 +956,59 @@ def _generate_all_svgs() -> None:
         ],
     )
 
+    _write_svgs(
+        "node-link-check",
+        "#0D4F8B",
+        "#10244E",
+        fg_elements_color=[
+            '<line x1="302" y1="602" x2="512" y2="372" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.65"/>',
+            '<line x1="512" y1="372" x2="722" y2="602" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.65"/>',
+            '<circle cx="302" cy="602" r="74" fill="#FFFFFF" opacity="0.96"/>',
+            '<circle cx="512" cy="372" r="82" fill="#5CF2D6" opacity="0.96"/>',
+            '<circle cx="722" cy="602" r="74" fill="#FFFFFF" opacity="0.96"/>',
+        ],
+        fg_elements_mono=[
+            '<line x1="302" y1="602" x2="512" y2="372" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.7"/>',
+            '<line x1="512" y1="372" x2="722" y2="602" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.7"/>',
+            '<circle cx="302" cy="602" r="74" fill="#FFFFFF"/>',
+            '<circle cx="512" cy="372" r="82" fill="#FFFFFF"/>',
+            '<circle cx="722" cy="602" r="74" fill="#FFFFFF"/>',
+        ],
+    )
+
+    _write_svgs(
+        "geo-location",
+        "#0F6A52",
+        "#0D2C44",
+        fg_elements_color=[
+            '<circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-width="52" opacity="0.92"/>',
+            '<rect x="272" y="494" width="480" height="36" rx="10" fill="#FFFFFF" opacity="0.92"/>',
+            '<rect x="494" y="272" width="36" height="480" rx="10" fill="#FFFFFF" opacity="0.92"/>',
+            '<circle cx="512" cy="512" r="64" fill="#5CF2D6" opacity="0.98"/>',
+        ],
+        fg_elements_mono=[
+            '<circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-width="52"/>',
+            '<rect x="272" y="494" width="480" height="36" rx="10" fill="#FFFFFF"/>',
+            '<rect x="494" y="272" width="36" height="480" rx="10" fill="#FFFFFF"/>',
+            '<circle cx="512" cy="512" r="64" fill="#FFFFFF"/>',
+        ],
+    )
+
+    mc_mask = [
+        '<mask id="media-cut">',
+        '  <rect width="1024" height="1024" fill="white"/>',
+        '  <path d="M 402 522 L 488 608 L 640 434" fill="none" stroke="black" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>',
+        '</mask>',
+    ]
+    _write_svgs(
+        "media-checker",
+        "#5B247A",
+        "#1B1F4F",
+        defs_extra=mc_mask,
+        fg_elements_color=['<rect x="252" y="326" width="520" height="372" rx="56" fill="#FFFFFF" mask="url(#media-cut)" opacity="0.96"/>'],
+        fg_elements_mono=['<rect x="252" y="326" width="520" height="372" rx="56" fill="#FFFFFF" mask="url(#media-cut)"/>'],
+    )
+
 
 def main() -> None:
     write_grid_overlay_svg()
@@ -971,6 +1055,30 @@ def main() -> None:
             "youtube",
             [ROOT / "assets/icons/youtube-myanmar-enhance.png"],
             ROOT / "assets/icons/squircle/youtube-myanmar-enhance.png",
+        ),
+        (
+            "node-link-check",
+            "#0D4F8B",
+            "#10244E",
+            "linkcheck",
+            [ROOT / "assets/icons/node-link-check.png"],
+            ROOT / "assets/icons/squircle/node-link-check.png",
+        ),
+        (
+            "geo-location",
+            "#0F6A52",
+            "#0D2C44",
+            "geo",
+            [ROOT / "assets/icons/geo-location.png"],
+            ROOT / "assets/icons/squircle/geo-location.png",
+        ),
+        (
+            "media-checker",
+            "#5B247A",
+            "#1B1F4F",
+            "media",
+            [ROOT / "assets/icons/media-checker.png"],
+            ROOT / "assets/icons/squircle/media-checker.png",
         ),
     ]
 

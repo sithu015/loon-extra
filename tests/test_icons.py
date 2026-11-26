@@ -43,6 +43,9 @@ class IconDesignSystemTests(unittest.TestCase):
         "meta-pixel-mitm",
         "telemetry-shield",
         "youtube-myanmar-enhance",
+        "node-link-check",
+        "geo-location",
+        "media-checker",
     )
 
     def test_unmasked_masters_are_1024_opaque_srgb(self) -> None:

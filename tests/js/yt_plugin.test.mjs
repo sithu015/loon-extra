@@ -439,3 +439,41 @@ test("Google Translate fallback works when YouTube native tlang=my fails or goog
   assert.match(out.body, /Second line\nဒုတိယစာကြောင်း/);
 });
 
+const geoLoc = require("../../scripts/loon/geo-location.js");
+const mediaChecker = require("../../scripts/loon/media-checker.js");
+const nodeLinkCheck = require("../../scripts/loon/node-link-check.js");
+
+test("localized diagnostic plugins render Myanmar+English output without Chinese strings", () => {
+  const geoHtml = geoLoc.formatInfoHtml(
+    JSON.stringify({
+      status: "success",
+      query: "23.230.52.119",
+      isp: "Example ISP",
+      as: "AS12345",
+      country: "United States",
+      countryCode: "US",
+      city: "Dallas",
+      timezone: "America/Chicago",
+      lon: -96.8,
+      lat: 32.7,
+      currency: "USD",
+    })
+  );
+  assert.match(geoHtml, /နိုင်ငံ \/ ဒေသ/);
+  assert.match(geoHtml, /United States · 🇺🇸/);
+  assert.doesNotMatch(geoHtml, /[\u4e00-\u9fff]/);
+
+  const mediaHtml = mediaChecker.renderHtml();
+  assert.match(mediaHtml, /စစ်ဆေးမှု/);
+  assert.doesNotMatch(mediaHtml, /[\u4e00-\u9fff]/);
+
+  const linkHtml = nodeLinkCheck.buildLinkSummaryHtml({
+    policy: "US 21",
+    protoType: "SHADOWSOCKS",
+    inIpInfo: { country: "Myanmar", regionName: "Yangon", city: "Yangon", query: "1.2.3.4", countryCode: "MM" },
+    outIpInfo: { country: "United States", regionName: "Texas", city: "Dallas", query: "23.230.52.119", countryCode: "US" },
+  });
+  assert.match(linkHtml, /ကြားခံလမ်းကြောင်း/);
+  assert.doesNotMatch(linkHtml, /[\u4e00-\u9fff]/);
+});
+
