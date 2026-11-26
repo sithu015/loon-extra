@@ -431,7 +431,7 @@ def validate_rules_list(path: Path, report: ValidationReport) -> None:
         report.error(path, None, "Ruleset file contains zero active rules")
 
 
-def validate_template_lcf(path: Path, report: ValidationReport) -> None:
+def validate_template_lcf(path: Path, report: ValidationReport, root: Path = ROOT) -> None:
     lines = _check_text_hygiene(path, path.read_bytes(), report)
     section = ""
     seen_rules: dict[str, int] = {}
@@ -443,7 +443,11 @@ def validate_template_lcf(path: Path, report: ValidationReport) -> None:
         if line.startswith("[") and line.endswith("]"):
             section = line.lower()
             continue
-        if section == "[rule]":
+        if section == "[proxy group]":
+            m_img = re.search(r"img-url\s*=\s*([^,\s]+)", line)
+            if m_img:
+                _check_repo_script_url(path, idx, m_img.group(1), root, report)
+        elif section == "[rule]":
             if line.upper().startswith("FINAL,"):
                 has_final = True
             _validate_rule_line(path, idx, line, "lcf", seen_rules, report)

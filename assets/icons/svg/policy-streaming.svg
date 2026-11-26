@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9B142C"/>
+      <stop offset="100%" stop-color="#4A0D36"/>
+    </linearGradient>
+<mask id="st-cut">
+  <rect width="1024" height="1024" fill="white"/>
+  <path d="M 460.00 426.00 L 598.00 512.00 L 460.00 598.00 Z" fill="black" stroke="black" stroke-width="20" stroke-linejoin="round"/>
+</mask>
+  </defs>
+  <g id="background">
+    <rect x="0" y="0" width="1024" height="1024" fill="url(#bg-grad)"/>
+  </g>
+  <g id="foreground">
+    <rect x="250" y="328" width="524" height="368" rx="58" fill="#FFFFFF" mask="url(#st-cut)" opacity="0.96"/>
+  </g>
+</svg>

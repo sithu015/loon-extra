@@ -1,0 +1,40 @@
+#!name = YouTube Music Myanmar & Enhance
+#!desc = Dedicated YouTube Music AdBlock, Background Audio & PiP Unlock, Upgrade/Upsell Removal, and Bilingual Myanmar Lyrics (Synced & Plain) — ကြော်ငြာပိတ်၊ နောက်ခံဖွင့်၊ မြန်မာစာသားဘာသာပြန် (Loon 3.5.1+)
+#!author = sithu015
+#!homepage = https://github.com/sithu015/loon-extra
+#!icon = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/youtube-music-myanmar.png
+#!source = b634ed2a13c5baf4cead6efe027bcd6f77889c2c258788580f5755e70aad5eda, a6e619569dfee2d624f6f70c792ef32473316cbc00be86b12d844a6c0fb79e0c
+#!system = iOS,iPadOS,macOS
+#!system_version = 15.0
+#!loon_version = 3.5.1(983)
+#!date = 2026-11-26
+#!tag = YouTubeMusic,Myanmar,Lyrics,AdBlock,MitM
+#!type = normal
+
+[Argument]
+lyricsMode = select, "dual_orig_top", "dual_my_top", "my_only", "off", type=string, tag=Lyrics Display / သီချင်းစာသားပုံစံ, desc=dual_orig_top (Original+Myanmar) / dual_my_top (Myanmar+Original) / my_only (Myanmar only) / off
+enableAdBlock = switch, true, type=boolean, tag=YTM AdBlock / ကြော်ငြာပိတ်, desc=Blocks YouTube Music audio/video ads, adSlots, and sponsored cards
+enableBgPlay = switch, true, type=boolean, tag=Background & Audio Mode / နောက်ခံဖွင့်, desc=Unlocks Background Audio Playback, Audio-Only mode, PiP, and playback settings
+removeUpsells = switch, true, type=boolean, tag=Remove Premium Upsells / Premium ကြော်ငြာဖယ်, desc=Removes Upgrade tab (SPunlimited) and Premium upgrade popups
+
+[Rule]
+AND,((DOMAIN,music.youtube.com),(PROTOCOL,UDP)),REJECT
+
+[Rewrite]
+request if ${enableAdBlock} == true && ${url} ~= /(^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads).+?)&ctier=L(&.+?),ctier,(.+)/ as m then url.replace("${m.1}${m.2}${m.3}")
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad/ then reject_img(200)
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/music\.youtube\.com\/api\/stats\/ads/ then reject_dict(200)
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/music\.youtube\.com\/(pagead|ptracking|get_midroll_info)/ then reject_dict(200)
+request if ${enableAdBlock} == true && ${url} ~= /^https?:\/\/music\.youtube\.com\/api\/stats\/qoe\?adcontext/ then reject_dict(200)
+
+[Script]
+# YouTube Music Web / Desktop PWA (JSON)
+response if ${url} ~= /^https?:\/\/music\.youtube\.com\/youtubei\/v1\/(player|get_watch|next|search|guide|account\/get_setting)(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/ytm-enhance.js", {${enableAdBlock}, ${enableBgPlay}, ${removeUpsells}}) with tag="YTMEnhanceWeb", requires_body=true, timeout=15
+response if ${url} ~= /^https?:\/\/music\.youtube\.com\/youtubei\/v1\/browse(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/ytm-lyrics-myanmar.js", {${lyricsMode}, ${enableAdBlock}, ${removeUpsells}}) with tag="YTMLyricsBrowseWeb", requires_body=true, timeout=25
+
+# YouTube Music iOS / macOS App (Protobuf)
+response if ${url} ~= /^https?:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(player|get_watch|next|search|guide|account\/get_setting)(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/ytm-enhance.js", {${enableAdBlock}, ${enableBgPlay}, ${removeUpsells}}) with tag="YTMEnhanceApp", requires_body=true, binary_body_mode=true, timeout=15
+response if ${url} ~= /^https?:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/browse(\?.*)?$/ then script("https://raw.githubusercontent.com/sithu015/loon-extra/main/scripts/loon/ytm-lyrics-myanmar.js", {${lyricsMode}, ${enableAdBlock}, ${removeUpsells}}) with tag="YTMLyricsBrowseApp", requires_body=true, binary_body_mode=true, timeout=25
+
+[Mitm]
+hostname = -redirector*.googlevideo.com, *.googlevideo.com, music.youtube.com, youtubei.googleapis.com

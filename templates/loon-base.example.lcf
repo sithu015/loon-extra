@@ -42,21 +42,22 @@ udp-fallback-mode = REJECT
 
 [Proxy Group]
 # --- Main Category Groups ---
-ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,DIRECT
-🤖 AI Services = select,🇺🇸 United States,🇸🇬 Singapore,🇯🇵 Japan,⚡ Auto (All),ShadowShare,DIRECT
-🎬 Streaming = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
-💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare
+ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-shadowshare.png
+🤖 AI Services = select,🇺🇸 United States,🇸🇬 Singapore,🇯🇵 Japan,⚡ Auto (All),ShadowShare,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-ai.png
+🎬 Streaming = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-streaming.png
+🎵 YouTube Music = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/youtube-music-myanmar.png
+💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-social.png
 # Keep 🔍 Search & Tech aligned with ShadowShare (⚡ Auto (All)) so Cloudflare Turnstile (challenges.cloudflare.com) shares the same exit IP as general websites
-🔍 Search & Tech = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,DIRECT
-🍎 Apple Services = select,DIRECT,⚡ Auto (All),🇺🇸 United States,ShadowShare
-🛑 AdBlock = select,REJECT,DIRECT
+🔍 Search & Tech = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-tech.png
+🍎 Apple Services = select,DIRECT,⚡ Auto (All),🇺🇸 United States,ShadowShare,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-apple.png
+🛑 AdBlock = select,REJECT,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-adblock.png
 
 # --- Regional & Auto Groups (Replace placeholder node names or bind Remote Proxy) ---
-⚡ Auto (All) = url-test,🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,url = http://www.gstatic.com/generate_204,interval = 600,tolerance = 50
-🇸🇬 Singapore = select,DIRECT
-🇺🇸 United States = select,DIRECT
-🇯🇵 Japan = select,DIRECT
-🇭🇰 Hong Kong = select,DIRECT
+⚡ Auto (All) = url-test,🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,🇭🇰 Hong Kong,url = http://www.gstatic.com/generate_204,interval = 600,tolerance = 50,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-auto.png
+🇸🇬 Singapore = select,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-sg.png
+🇺🇸 United States = select,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-us.png
+🇯🇵 Japan = select,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-jp.png
+🇭🇰 Hong Kong = select,DIRECT,img-url = https://raw.githubusercontent.com/sithu015/loon-extra/main/assets/icons/policy-hk.png
 
 [Proxy Chain]
 
@@ -134,6 +135,7 @@ DOMAIN-KEYWORD,openaicom,🤖 AI Services
 DOMAIN-KEYWORD,colab,🤖 AI Services
 
 # --- Streaming ---
+DOMAIN,music.youtube.com,🎵 YouTube Music
 DOMAIN-SUFFIX,youtube.com,🎬 Streaming
 DOMAIN-SUFFIX,googlevideo.com,🎬 Streaming
 DOMAIN-SUFFIX,ytimg.com,🎬 Streaming
@@ -285,6 +287,7 @@ https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/google-ai-aut
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/telemetry-shield.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/meta-pixel-mitm.lpx, enabled=false
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/youtube-myanmar-enhance.lpx, enabled=true
+https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/youtube-music-myanmar.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/node-link-check.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/geo-location.lpx, enabled=true
 https://raw.githubusercontent.com/sithu015/loon-extra/main/plugins/media-checker.lpx, enabled=true

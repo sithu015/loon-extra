@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+<mask id="ad-cut"><rect width="1024" height="1024" fill="white"/><rect x="370" y="478" width="284" height="68" rx="18" fill="black"/></mask>
+  </defs>
+  <g id="foreground">
+    <polygon points="759.60,614.56 614.56,759.60 409.44,759.60 264.40,614.56 264.40,409.44 409.44,264.40 614.56,264.40 759.60,409.44" fill="#FFFFFF" mask="url(#ad-cut)"/>
+  </g>
+</svg>

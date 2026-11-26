@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+
+  </defs>
+  <g id="foreground">
+    <circle cx="512" cy="488" r="184" fill="#FFFFFF"/><ellipse cx="536" cy="288" rx="34" ry="58" transform="rotate(-35 536 288)" fill="#FFFFFF"/>
+  </g>
+</svg>

@@ -16,6 +16,7 @@ Architecture:
 
 from __future__ import annotations
 
+import argparse
 import math
 import struct
 import zlib
@@ -60,7 +61,6 @@ def _write_png(path: Path, width: int, height: int, pixels: bytearray, rgba: boo
         raw.extend(pixels[start : start + stride])
 
     ihdr = struct.pack(">IIBBBBB", width, height, 8, color_type, 0, 0, 0)
-    # Standard sRGB chunk (intent=0 Perceptual) + gAMA (1/2.2 = 45455)
     srgb = struct.pack(">B", 0)
     gama = struct.pack(">I", 45455)
     compressed = zlib.compress(bytes(raw), level=6)
@@ -120,14 +120,9 @@ def squircle_svg_path(
     b = par["b"]
     c = par["c"]
     d = par["d"]
-    arc_len = par["arc_section_length"]
 
-    # Corner coordinates in [0, size] box (matching figma-squircle top-right -> clockwise)
-    # Start on top edge before top-right transition: (size - p, 0)
     w = size
     h = size
-    # Precompute points in box [0, w] x [0, h]
-    # Top-right corner
     tr_p0 = (w - p, 0.0)
     tr_c1 = (w - (p - a), 0.0)
     tr_c2 = (w - (p - a - b), 0.0)
@@ -137,7 +132,6 @@ def squircle_svg_path(
     tr_c4 = (w, p - a)
     tr_p2 = (w, p)
 
-    # Bottom-right corner
     br_p0 = (w, h - p)
     br_c1 = (w, h - (p - a))
     br_c2 = (w, h - (p - a - b))
@@ -147,7 +141,6 @@ def squircle_svg_path(
     br_c4 = (w - (p - a), h)
     br_p2 = (w - p, h)
 
-    # Bottom-left corner
     bl_p0 = (p, h)
     bl_c1 = (p - a, h)
     bl_c2 = (p - a - b, h)
@@ -157,7 +150,6 @@ def squircle_svg_path(
     bl_c4 = (0.0, h - (p - a))
     bl_p2 = (0.0, h - p)
 
-    # Top-left corner
     tl_p0 = (0.0, p)
     tl_c1 = (0.0, p - a)
     tl_c2 = (0.0, p - a - b)
@@ -170,7 +162,6 @@ def squircle_svg_path(
     def pt(xy: tuple[float, float]) -> str:
         return f"{xy[0] + offset_x:.3f} {xy[1] + offset_y:.3f}"
 
-    _ = arc_len  # validated in corner params
     cmds = [
         f"M {pt(tr_p0)}",
         f"C {pt(tr_c1)}, {pt(tr_c2)}, {pt(tr_p1)}",
@@ -225,8 +216,6 @@ def _sample_squircle_quadrant(
     c = par["c"]
     d = par["d"]
 
-    # Convert top-right corner coordinates into centered quadrant coordinates [0, half]^2
-    # where x = half - (w - coord_x) -> coord_x - half, y = half - coord_y
     def to_q(cx: float, cy: float) -> tuple[float, float]:
         return (cx - half, half - cy)
 
@@ -241,10 +230,8 @@ def _sample_squircle_quadrant(
     p2 = to_q(w, p)
 
     pts: list[tuple[float, float]] = []
-    # 1. First cubic shoulder
     for i in range(steps):
         pts.append(_eval_cubic(p0, c1, c2, p1, i / steps))
-    # 2. Circular arc center is (half - r, half - r)
     cx_arc, cy_arc = half - r, half - r
     ang0 = math.atan2(p1[1] - cy_arc, p1[0] - cx_arc)
     ang1 = math.atan2(arc_end[1] - cy_arc, arc_end[0] - cx_arc)
@@ -252,7 +239,6 @@ def _sample_squircle_quadrant(
         t = i / steps
         ang = ang0 + (ang1 - ang0) * t
         pts.append((cx_arc + r * math.cos(ang), cy_arc + r * math.sin(ang)))
-    # 3. Second cubic shoulder
     for i in range(steps + 1):
         pts.append(_eval_cubic(arc_end, c3, c4, p2, i / steps))
     return half - p, pts
@@ -266,17 +252,15 @@ def _build_squircle_sd(
     """Return an O(1)-fast exact SDF closure for the G^2 continuous-curvature squircle."""
     flat_limit, pts = _sample_squircle_quadrant(size, radius_ratio, smoothing, steps=72)
     half = size / 2.0
-    # Precompute segments and angular index around (flat_limit, flat_limit)
-    segs: list[tuple[float, float, float, float, float, float]] = []
+    segs: list[tuple[float, float, float, float, float]] = []
     for i in range(len(pts) - 1):
         ax, ay = pts[i]
         bx, by = pts[i + 1]
         dx, dy = bx - ax, by - ay
         l2 = dx * dx + dy * dy
         if l2 > 1e-12:
-            segs.append((ax, ay, dx, dy, 1.0 / l2, bx))
+            segs.append((ax, ay, dx, dy, 1.0 / l2))
 
-    # Map theta in [0, pi/2] (measured from (flat_limit, flat_limit)) -> center segment index
     n_segs = len(segs)
     ang_bins = 256
     seg_angles = [
@@ -285,7 +269,7 @@ def _build_squircle_sd(
     ]
     lut: list[int] = []
     for k in range(ang_bins + 1):
-        th = (math.pi / 2.0) * (1.0 - k / ang_bins)  # decreasing from pi/2 (top) to 0 (right)
+        th = (math.pi / 2.0) * (1.0 - k / ang_bins)
         best_i = 0
         best_diff = 999.0
         for i, sa in enumerate(seg_angles):
@@ -314,7 +298,7 @@ def _build_squircle_sd(
         min_d2 = 1e18
         best_cross = 1.0
         for i in range(lo, hi):
-            ax, ay, dx, dy, inv_l2, _ = segs[i]
+            ax, ay, dx, dy, inv_l2 = segs[i]
             pax, pay = qx - ax, qy - ay
             h = (pax * dx + pay * dy) * inv_l2
             if h < 0.0:
@@ -326,13 +310,39 @@ def _build_squircle_sd(
             d2 = rx * rx + ry * ry
             if d2 < min_d2:
                 min_d2 = d2
-                # Boundary goes clockwise in top-right (dx > 0, dy < 0):
-                # outside is to the left of tangent? Wait: dx>0, dy<0 -> (pax*dy - pay*dx)
                 best_cross = pax * dy - pay * dx
         dist = math.sqrt(min_d2)
         return -dist if best_cross > 0.0 else dist
 
     return sd
+
+
+def _precompute_squircle_alpha() -> bytearray:
+    """Compute the 1024x1024 G^2 squircle alpha byte grid ONCE (exploiting 4-way symmetry)."""
+    squircle_sd = _build_squircle_sd()
+    alpha = bytearray(SIZE * SIZE)
+    flat = SIZE * 0.5 - SIZE * SQUIRCLE_RADIUS_RATIO * (1.0 + SQUIRCLE_SMOOTHING) - 4.0
+    for y in range(SIZE // 2):
+        py = (y + 0.5) - HALF
+        y_mir = SIZE - 1 - y
+        row_a = y * SIZE
+        row_b = y_mir * SIZE
+        if abs(py) <= flat:
+            alpha[row_a : row_a + SIZE] = b"\xff" * SIZE
+            alpha[row_b : row_b + SIZE] = b"\xff" * SIZE
+            continue
+        for x in range(SIZE // 2):
+            px = (x + 0.5) - HALF
+            if abs(px) <= flat:
+                a8 = 255
+            else:
+                a8 = int(round((1.0 - _smoothstep(-1.1, 1.1, squircle_sd(px, py))) * 255))
+            x_mir = SIZE - 1 - x
+            alpha[row_a + x] = a8
+            alpha[row_a + x_mir] = a8
+            alpha[row_b + x] = a8
+            alpha[row_b + x_mir] = a8
+    return alpha
 
 
 def _sd_circle(px: float, py: float, r: float) -> float:
@@ -348,7 +358,6 @@ def _sd_arc(px: float, py: float, r_mid: float, half_thick: float, center_deg: f
     ang = math.atan2(py, px)
     c_rad = math.radians(center_deg)
     span_rad = math.radians(half_span_deg)
-    # Signed angular delta in [-pi, pi]
     da = (ang - c_rad + math.pi) % (2.0 * math.pi) - math.pi
     if abs(da) <= span_rad:
         return abs(math.hypot(px, py) - r_mid) - half_thick
@@ -405,9 +414,23 @@ def _sd_polygon(px: float, py: float, poly: list[tuple[float, float]]) -> float:
     return -dist if inside else dist
 
 
+def _sd_octagon(px: float, py: float, r: float) -> float:
+    """Exact signed distance to a regular octagon with apothem `r`."""
+    kx, ky, kz = -0.9238795325, 0.3826834323, 0.4142135623
+    x, y = abs(px), abs(py)
+    dot1 = min(kx * x + ky * y, 0.0)
+    x -= 2.0 * dot1 * kx
+    y -= 2.0 * dot1 * ky
+    dot2 = min(-kx * x + ky * y, 0.0)
+    x -= 2.0 * dot2 * (-kx)
+    y -= 2.0 * dot2 * ky
+    x -= _clamp(x, -kz * r, kz * r)
+    y -= r
+    d = math.hypot(x, y)
+    return -d if y < 0.0 else d
+
+
 def _build_shield_poly() -> list[tuple[float, float]]:
-    """Apple-grid symmetric cubic-bezier shield centered at (0, 0), fitting inside 80% Primary Circle."""
-    # Height ~ 672 (-336 to +336), Width ~ 560 (-280 to +280); max corner radius well < 409.6
     segs = [
         ((0.0, -328.0), (140.0, -328.0), (242.0, -312.0), (268.0, -254.0)),
         ((268.0, -254.0), (284.0, -214.0), (282.0, -90.0), (272.0, 26.0)),
@@ -421,7 +444,6 @@ def _build_shield_poly() -> list[tuple[float, float]]:
 
 
 def _build_astroid_poly(radius: float = 236.0, round_tip: float = 14.0) -> list[tuple[float, float]]:
-    """4-point smooth cubic-bezier AI spark with softened tips for Liquid Glass legibility."""
     k = 56.0
     r = radius - round_tip
     segs = [
@@ -447,7 +469,6 @@ def _build_star_poly(cx: float, cy: float, r_outer: float, r_inner: float) -> li
 
 
 def _build_balloon_poly() -> list[tuple[float, float]]:
-    """Tazaungdaing hot-air fire balloon (Mee Pone Pyan) envelope inside 80% Primary Circle."""
     segs = [
         ((0.0, -328.0), (148.0, -328.0), (246.0, -230.0), (246.0, -104.0)),
         ((246.0, -104.0), (246.0, 12.0), (166.0, 102.0), (112.0, 154.0)),
@@ -459,7 +480,6 @@ def _build_balloon_poly() -> list[tuple[float, float]]:
 
 
 def _build_flame_poly() -> list[tuple[float, float]]:
-    """Crisp hanging flame / fire-pan drop beneath the balloon mouth."""
     segs = [
         ((0.0, 206.0), (38.0, 240.0), (52.0, 274.0), (34.0, 308.0)),
         ((34.0, 308.0), (18.0, 332.0), (-18.0, 332.0), (-34.0, 308.0)),
@@ -469,17 +489,12 @@ def _build_flame_poly() -> list[tuple[float, float]]:
 
 
 def _build_balloon_ribs() -> tuple[list[tuple[float, float]], list[tuple[float, float]]]:
-    """Symmetric meridian curve guides for the fire-balloon panel cutouts."""
     left_rib = _eval_bezier_poly(
-        [
-            ((-16.0, -312.0), (-118.0, -242.0), (-146.0, -112.0), (-78.0, 144.0)),
-        ],
+        [(( -16.0, -312.0), (-118.0, -242.0), (-146.0, -112.0), (-78.0, 144.0))],
         steps=48,
     )
     right_rib = _eval_bezier_poly(
-        [
-            ((16.0, -312.0), (118.0, -242.0), (146.0, -112.0), (78.0, 144.0)),
-        ],
+        [((16.0, -312.0), (118.0, -242.0), (146.0, -112.0), (78.0, 144.0))],
         steps=48,
     )
     return left_rib, right_rib
@@ -491,10 +506,31 @@ FLAME_POLY = _build_flame_poly()
 BALLOON_LEFT_RIB, BALLOON_RIGHT_RIB = _build_balloon_ribs()
 SHIELD_POLY = _build_shield_poly()
 ASTROID_POLY = _build_astroid_poly()
-PLAY_TRI_POLY = [
-    (-56.0, -112.0),
-    (84.0, -34.0),
-    (-56.0, 44.0),
+PLAY_TRI_POLY = [(-56.0, -112.0), (84.0, -34.0), (-56.0, 44.0)]
+CENTER_PLAY_POLY = [(-52.0, -86.0), (86.0, 0.0), (-52.0, 86.0)]
+BOLT_POLY = [
+    (44.0, -214.0),
+    (-112.0, 18.0),
+    (-6.0, 18.0),
+    (-44.0, 214.0),
+    (112.0, -18.0),
+    (6.0, -18.0),
+]
+MAPLE_POLY = [
+    (x * 0.78, y * 0.78)
+    for x, y in [
+        (0.0, -158.0), (26.0, -110.0), (54.0, -120.0), (42.0, -52.0),
+        (96.0, -90.0), (96.0, -56.0), (144.0, -54.0), (126.0, -18.0),
+        (148.0, 6.0), (72.0, 56.0), (84.0, 86.0), (12.0, 74.0),
+        (14.0, 146.0), (-14.0, 146.0), (-12.0, 74.0), (-84.0, 86.0),
+        (-72.0, 56.0), (-148.0, 6.0), (-126.0, -18.0), (-144.0, -54.0),
+        (-96.0, -56.0), (-96.0, -90.0), (-42.0, -52.0), (-54.0, -120.0),
+        (-26.0, -110.0),
+    ]
+]
+HK_PETAL_CENTERS = [
+    (math.cos(math.radians(-90.0 + i * 72.0)), math.sin(math.radians(-90.0 + i * 72.0)))
+    for i in range(5)
 ]
 
 
@@ -580,15 +616,10 @@ def write_grid_overlay_svg() -> None:
     inner_sq_path = squircle_svg_path(SIZE * 0.72, offset_x=SIZE * 0.14, offset_y=SIZE * 0.14)
     grid_svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}" width="{SIZE}" height="{SIZE}">
   <rect x="0" y="0" width="{SIZE}" height="{SIZE}" fill="#0F172A"/>
-  <!-- Outer G^2 Continuous Curvature Squircle (r=22.37%, smoothing=60%) -->
   <path d="{sq_path}" fill="#1E293B" stroke="#38BDF8" stroke-width="4"/>
-  <!-- 80% Primary Circle (d = 819.2 px, r = 409.6 px) -->
   <circle cx="512" cy="512" r="{PRIMARY_CIRCLE_R:.2f}" fill="none" stroke="#FBBF24" stroke-width="3" stroke-dasharray="12 10"/>
-  <!-- 72% Safe Inner Squircle -->
   <path d="{inner_sq_path}" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 8"/>
-  <!-- 52% Core Keyline Circle -->
   <circle cx="512" cy="512" r="{SIZE * 0.26:.2f}" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 8"/>
-  <!-- Orthogonals & Diagonals -->
   <line x1="512" y1="0" x2="512" y2="1024" stroke="#475569" stroke-width="2"/>
   <line x1="0" y1="512" x2="1024" y2="512" stroke="#475569" stroke-width="2"/>
   <line x1="0" y1="0" x2="1024" y2="1024" stroke="#334155" stroke-width="2"/>
@@ -616,17 +647,133 @@ def _sd_polyline(px: float, py: float, pts: list[tuple[float, float]]) -> float:
     return math.sqrt(min_d2)
 
 
-def _render_icon(
-    name: str,
-    top_hex: str,
-    bot_hex: str,
+def _flag_medallion_color(
+    flag: str, px: float, py: float, bg: tuple[float, float, float]
+) -> tuple[float, float, float]:
+    """Render a crisp circular r=244 flag disc framed by a silver-slate rim inside r<=272."""
+    r = math.hypot(px, py)
+    disc_r = 244.0
+    outer_rim_r = 266.0
+    white = _hex_to_rgb01("#F8FAFC")
+    rim_col = _hex_to_rgb01("#CBD5E1")
+    red = _hex_to_rgb01("#DC2626")
+    crimson = _hex_to_rgb01("#E11D48")
+    navy = _hex_to_rgb01("#1E3A8A")
+    cobalt = _hex_to_rgb01("#1D4ED8")
+    gold = _hex_to_rgb01("#FACC15")
+    dark = _hex_to_rgb01("#18181B")
+
+    # Outer bezel ring
+    col = bg
+    rim_a = 1.0 - _smoothstep(-1.1, 1.1, max(r - outer_rim_r, disc_r - 2.0 - r))
+    if rim_a > 0.0:
+        col = _blend_rgb(col, rim_col, rim_a * 0.72)
+
+    disc_a = 1.0 - _smoothstep(-1.1, 1.1, r - disc_r)
+    if disc_a <= 0.0:
+        return col
+
+    fc = white
+    if flag == "sg":
+        # Red upper half, white lower half, crisp white crescent & 5 stars in upper-left
+        half_a = 1.0 - _smoothstep(-1.1, 1.1, py)
+        fc = _blend_rgb(white, crimson, half_a)
+        d_outer = math.hypot(px + 68.0, py + 94.0) - 56.0
+        d_inner = math.hypot(px + 42.0, py + 94.0) - 52.0
+        cresc_a = 1.0 - _smoothstep(-1.1, 1.1, max(d_outer, -d_inner))
+        fc = _blend_rgb(fc, white, cresc_a)
+        for sx, sy in ((-38.0, -124.0), (-14.0, -104.0), (-24.0, -76.0), (-54.0, -76.0), (-64.0, -104.0)):
+            sa = 1.0 - _smoothstep(-1.1, 1.1, math.hypot(px - sx, py - sy) - 10.5)
+            if sa > 0.0:
+                fc = _blend_rgb(fc, white, sa)
+    elif flag == "us":
+        stripe_idx = math.floor((py + disc_r) / (2.0 * disc_r / 9.0))
+        fc = red if (stripe_idx % 2 == 0) else white
+        canton_a = 1.0 - _smoothstep(-1.1, 1.1, max(px - 10.0, py - 10.0))
+        if canton_a > 0.0:
+            fc = _blend_rgb(fc, navy, canton_a)
+            if px <= 8.0 and py <= 8.0:
+                for gx in (-145.0, -95.0, -45.0):
+                    for gy in (-145.0, -95.0, -45.0):
+                        sa = 1.0 - _smoothstep(-1.1, 1.1, math.hypot(px - gx, py - gy) - 10.0)
+                        if sa > 0.0:
+                            fc = _blend_rgb(fc, white, sa)
+    elif flag == "jp":
+        sun_a = 1.0 - _smoothstep(-1.1, 1.1, r - 106.0)
+        fc = _blend_rgb(white, red, sun_a)
+    elif flag == "hk":
+        fc = crimson
+        for cx, cy in HK_PETAL_CENTERS:
+            px0, py0 = cx * 62.0, cy * 62.0
+            pa = 1.0 - _smoothstep(-1.1, 1.1, math.hypot(px - px0, py - py0) - 48.0)
+            if pa > 0.0:
+                fc = _blend_rgb(fc, white, pa)
+        center_a = 1.0 - _smoothstep(-1.1, 1.1, r - 20.0)
+        if center_a > 0.0:
+            fc = _blend_rgb(fc, crimson, center_a * 0.85)
+    elif flag == "kr":
+        fc = white
+        tae_r = 96.0
+        ang_rot = (px * 0.8 + py * 0.6)
+        perp = (-px * 0.6 + py * 0.8)
+        top_half = 1.0 - _smoothstep(-1.1, 1.1, perp)
+        tc = _blend_rgb(cobalt, red, top_half)
+        u_a = 1.0 - _smoothstep(-1.1, 1.1, math.hypot(px - 38.4, py + 28.8) - tae_r * 0.5)
+        l_a = 1.0 - _smoothstep(-1.1, 1.1, math.hypot(px + 38.4, py - 28.8) - tae_r * 0.5)
+        _ = ang_rot
+        tc = _blend_rgb(tc, red, u_a)
+        tc = _blend_rgb(tc, cobalt, l_a)
+        tae_a = 1.0 - _smoothstep(-1.1, 1.1, r - tae_r)
+        if tae_a > 0.0:
+            fc = _blend_rgb(fc, tc, tae_a)
+        for sx, sy in ((-128.0, -108.0), (128.0, -108.0), (-128.0, 108.0), (128.0, 108.0)):
+            b_a = 1.0 - _smoothstep(-1.1, 1.1, _sd_rounded_box(px - sx, py - sy, 32.0, 11.0, 4.0))
+            if b_a > 0.0:
+                fc = _blend_rgb(fc, dark, b_a)
+    elif flag == "ca":
+        side_a = 1.0 - _smoothstep(-1.1, 1.1, 128.0 - abs(px))
+        fc = _blend_rgb(white, red, side_a)
+        if abs(px) <= 160.0 and abs(py) <= 170.0:
+            ma = 1.0 - _smoothstep(-1.1, 1.1, _sd_polygon(px, py, MAPLE_POLY))
+            if ma > 0.0:
+                fc = _blend_rgb(fc, red, ma)
+    elif flag == "nl":
+        t_a = 1.0 - _smoothstep(-1.1, 1.1, py + 82.0)
+        b_a = 1.0 - _smoothstep(-1.1, 1.1, 82.0 - py)
+        fc = _blend_rgb(white, red, t_a)
+        fc = _blend_rgb(fc, cobalt, b_a)
+    elif flag == "fr":
+        l_a = 1.0 - _smoothstep(-1.1, 1.1, px + 82.0)
+        r_a = 1.0 - _smoothstep(-1.1, 1.1, 82.0 - px)
+        fc = _blend_rgb(white, cobalt, l_a)
+        fc = _blend_rgb(fc, red, r_a)
+    elif flag == "de":
+        t_a = 1.0 - _smoothstep(-1.1, 1.1, py + 82.0)
+        b_a = 1.0 - _smoothstep(-1.1, 1.1, 82.0 - py)
+        fc = _blend_rgb(red, dark, t_a)
+        fc = _blend_rgb(fc, gold, b_a)
+    elif flag == "uk":
+        fc = navy
+        d_d1 = _sd_segment(px, py, -240.0, -240.0, 240.0, 240.0)
+        d_d2 = _sd_segment(px, py, -240.0, 240.0, 240.0, -240.0)
+        diag_w = 1.0 - _smoothstep(-1.1, 1.1, min(d_d1, d_d2) - 34.0)
+        diag_r = 1.0 - _smoothstep(-1.1, 1.1, min(d_d1, d_d2) - 14.0)
+        fc = _blend_rgb(fc, white, diag_w)
+        fc = _blend_rgb(fc, red, diag_r)
+        cw_a = 1.0 - _smoothstep(-1.1, 1.1, min(abs(px), abs(py)) - 44.0)
+        cr_a = 1.0 - _smoothstep(-1.1, 1.1, min(abs(px), abs(py)) - 26.0)
+        fc = _blend_rgb(fc, white, cw_a)
+        fc = _blend_rgb(fc, red, cr_a)
+
+    return _blend_rgb(col, fc, disc_a)
+
+
+def _motif_pixel(
     motif: str,
-    squircle_sd,
-    outputs_unmasked: list[Path],
-    output_squircle: Path,
-) -> None:
-    top_rgb = _hex_to_rgb01(top_hex)
-    bot_rgb = _hex_to_rgb01(bot_hex)
+    px: float,
+    py: float,
+    bg_col: tuple[float, float, float],
+) -> tuple[float, float, float]:
     white = (1.0, 1.0, 1.0)
     gold = _hex_to_rgb01("#FFD452")
     amber = _hex_to_rgb01("#FF9233")
@@ -634,9 +781,256 @@ def _render_icon(
     moon_silver = _hex_to_rgb01("#FDE68A")
     mint = _hex_to_rgb01("#5CF2D6")
     coral = _hex_to_rgb01("#FF5263")
+    slate_hi = _hex_to_rgb01("#E2E8F0")
+
+    col = bg_col
+
+    if motif.startswith("flag_"):
+        return _flag_medallion_color(motif[5:], px, py, col)
+
+    if motif == "myanmar":
+        d_moon = math.hypot(px - 264.0, py + 252.0) - 34.0
+        moon_a = 1.0 - _smoothstep(-1.1, 1.1, d_moon)
+        if moon_a > 0.0:
+            col = _blend_rgb(col, moon_silver, moon_a * 0.94)
+        if abs(px) <= 258.0 and -336.0 <= py <= 176.0:
+            d_env = _sd_polygon(px, py, BALLOON_POLY)
+            if d_env <= 4.0:
+                d_rib = min(
+                    _sd_polyline(px, py, BALLOON_LEFT_RIB),
+                    _sd_polyline(px, py, BALLOON_RIGHT_RIB),
+                ) - 10.0
+                d_star_cut = _sd_polygon(px, py, BALLOON_STAR_POLY) - 4.0
+                d_canopy = max(d_env, -d_rib, -d_star_cut)
+                can_a = 1.0 - _smoothstep(-1.1, 1.1, d_canopy)
+                if can_a > 0.0:
+                    env_t = _clamp((py + 328.0) / 485.0)
+                    env_rgb = (
+                        lantern_warm[0] * (1.0 - env_t) + gold[0] * env_t,
+                        lantern_warm[1] * (1.0 - env_t) + gold[1] * env_t,
+                        lantern_warm[2] * (1.0 - env_t) + gold[2] * env_t,
+                    )
+                    col = _blend_rgb(col, env_rgb, can_a)
+        if abs(px) <= 130.0 and 164.0 <= py <= 345.0:
+            d_rim = _sd_rounded_box(px, py - 186.0, 108.0, 11.0, 10.0)
+            rim_a = 1.0 - _smoothstep(-1.1, 1.1, d_rim)
+            if rim_a > 0.0:
+                col = _blend_rgb(col, white, rim_a * 0.95)
+            d_flame = _sd_polygon(px, py, FLAME_POLY)
+            fl_a = 1.0 - _smoothstep(-1.1, 1.1, d_flame)
+            if fl_a > 0.0:
+                col = _blend_rgb(col, amber, fl_a)
+            d_flame_core = _sd_circle(px, py - 284.0, 18.0)
+            fc_a = 1.0 - _smoothstep(-1.1, 1.1, d_flame_core)
+            if fc_a > 0.0:
+                col = _blend_rgb(col, lantern_warm, fc_a)
+
+    elif motif == "ai":
+        d_arc1 = _sd_arc(px, py, 336.0, 26.0, -45.0, 56.0)
+        d_arc2 = _sd_arc(px, py, 336.0, 26.0, 135.0, 56.0)
+        arc_a = 1.0 - _smoothstep(-1.1, 1.1, min(d_arc1, d_arc2))
+        if arc_a > 0.0:
+            col = _blend_rgb(col, white, arc_a * 0.55)
+        if abs(px) <= 245.0 and abs(py) <= 245.0:
+            d_ast = _sd_polygon(px, py, ASTROID_POLY) - 10.0
+            d_hole = _sd_circle(px, py, 44.0)
+            sp_a = 1.0 - _smoothstep(-1.1, 1.1, max(d_ast, -d_hole))
+            if sp_a > 0.0:
+                col = _blend_rgb(col, white, sp_a * 0.98)
+            core_a = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px, py, 24.0))
+            if core_a > 0.0:
+                col = _blend_rgb(col, mint, core_a)
+
+    elif motif == "pixel":
+        d_slash_core = _sd_segment(px, py, -264.0, 264.0, 264.0, -264.0) - 30.0
+        d_slash_gap = d_slash_core - 28.0
+        if abs(px) <= 250.0 and abs(py) <= 250.0:
+            d_tiles = 1e9
+            for gx in (-164.0, 0.0, 164.0):
+                if abs(px - gx) > 68.0:
+                    continue
+                for gy in (-164.0, 0.0, 164.0):
+                    if abs(py - gy) > 68.0:
+                        continue
+                    d_tiles = min(d_tiles, _sd_rounded_box(px - gx, py - gy, 60.0, 60.0, 18.0))
+            tile_a = 1.0 - _smoothstep(-1.1, 1.1, max(d_tiles, -d_slash_gap))
+            if tile_a > 0.0:
+                col = _blend_rgb(col, white, tile_a * 0.92)
+        slash_a = 1.0 - _smoothstep(-1.1, 1.1, d_slash_core)
+        if slash_a > 0.0:
+            col = _blend_rgb(col, coral, slash_a)
+
+    elif motif == "shield":
+        if abs(px) <= 295.0 and abs(py) <= 355.0:
+            d_sh = _sd_polygon(px, py, SHIELD_POLY)
+            d_c1 = _sd_segment(px, py, -110.0, 6.0, -22.0, 96.0) - 34.0
+            d_c2 = _sd_segment(px, py, -22.0, 96.0, 128.0, -76.0) - 34.0
+            sh_a = 1.0 - _smoothstep(-1.1, 1.1, max(d_sh, -min(d_c1, d_c2)))
+            if sh_a > 0.0:
+                col = _blend_rgb(col, white, sh_a * 0.96)
+
+    elif motif == "youtube":
+        if abs(px) <= 280.0 and -215.0 <= py <= 145.0:
+            d_screen = _sd_rounded_box(px, py + 34.0, 260.0, 164.0, 64.0)
+            d_play = _sd_polygon(px, py, PLAY_TRI_POLY) - 10.0
+            sc_a = 1.0 - _smoothstep(-1.1, 1.1, max(d_screen, -d_play))
+            if sc_a > 0.0:
+                col = _blend_rgb(col, white, sc_a * 0.96)
+        if abs(px) <= 240.0 and 155.0 <= py <= 315.0:
+            b1_a = 1.0 - _smoothstep(-1.1, 1.1, _sd_rounded_box(px, py - 186.0, 196.0, 18.0, 16.0))
+            if b1_a > 0.0:
+                col = _blend_rgb(col, white, b1_a * 0.94)
+            b2_a = 1.0 - _smoothstep(-1.1, 1.1, _sd_rounded_box(px, py - 246.0, 142.0, 18.0, 16.0))
+            if b2_a > 0.0:
+                col = _blend_rgb(col, gold, b2_a * 0.98)
+
+    elif motif == "ytmusic":
+        # Concentric Apple-style vinyl ring + warm gold accent ring + crisp center play triangle
+        d_outer = _sd_ring(px, py, 246.0, 22.0)
+        oa = 1.0 - _smoothstep(-1.1, 1.1, d_outer)
+        if oa > 0.0:
+            col = _blend_rgb(col, white, oa * 0.95)
+        d_inner = _sd_ring(px, py, 168.0, 12.0)
+        ia = 1.0 - _smoothstep(-1.1, 1.1, d_inner)
+        if ia > 0.0:
+            col = _blend_rgb(col, gold, ia * 0.96)
+        if abs(px) <= 105.0 and abs(py) <= 105.0:
+            d_tri = _sd_polygon(px, py, CENTER_PLAY_POLY) - 12.0
+            ta = 1.0 - _smoothstep(-1.1, 1.1, d_tri)
+            if ta > 0.0:
+                col = _blend_rgb(col, white, ta * 0.98)
+
+    elif motif == "linkcheck":
+        d_l1 = _sd_segment(px, py, -210.0, 90.0, 0.0, -140.0) - 24.0
+        d_l2 = _sd_segment(px, py, 0.0, -140.0, 210.0, 90.0) - 24.0
+        l_a = 1.0 - _smoothstep(-1.1, 1.1, min(d_l1, d_l2))
+        if l_a > 0.0:
+            col = _blend_rgb(col, white, l_a * 0.65)
+        for cx, cy, cr, accent in ((-210.0, 90.0, 74.0, white), (0.0, -140.0, 82.0, mint), (210.0, 90.0, 74.0, white)):
+            na = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px - cx, py - cy, cr))
+            if na > 0.0:
+                col = _blend_rgb(col, accent, na * 0.96)
+
+    elif motif == "geo":
+        d_ring = _sd_ring(px, py, 240.0, 26.0)
+        d_eq = _sd_rounded_box(px, py, 240.0, 18.0, 10.0)
+        d_mer = _sd_rounded_box(px, py, 18.0, 240.0, 10.0)
+        ga = 1.0 - _smoothstep(-1.1, 1.1, min(d_ring, d_eq, d_mer))
+        if ga > 0.0:
+            col = _blend_rgb(col, white, ga * 0.92)
+        ca = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px, py, 64.0))
+        if ca > 0.0:
+            col = _blend_rgb(col, mint, ca * 0.98)
+
+    elif motif == "media":
+        if abs(px) <= 290.0 and abs(py) <= 230.0:
+            d_box = _sd_rounded_box(px, py, 260.0, 186.0, 56.0)
+            d_c1 = _sd_segment(px, py, -110.0, 10.0, -24.0, 96.0) - 30.0
+            d_c2 = _sd_segment(px, py, -24.0, 96.0, 128.0, -78.0) - 30.0
+            ma = 1.0 - _smoothstep(-1.1, 1.1, max(d_box, -min(d_c1, d_c2)))
+            if ma > 0.0:
+                col = _blend_rgb(col, white, ma * 0.96)
+
+    elif motif == "shadowshare":
+        # Interlocking rounded gateway rings + luminous mint core diamond
+        d_r1 = _sd_ring(px + 68.0, py, 166.0, 28.0)
+        d_r2 = _sd_ring(px - 68.0, py, 166.0, 28.0)
+        ra = 1.0 - _smoothstep(-1.1, 1.1, min(d_r1, d_r2))
+        if ra > 0.0:
+            col = _blend_rgb(col, white, ra * 0.94)
+        da = 1.0 - _smoothstep(-1.1, 1.1, (abs(px) + abs(py)) * 0.7071 - 56.0)
+        if da > 0.0:
+            col = _blend_rgb(col, mint, da * 0.98)
+
+    elif motif == "streaming":
+        if abs(px) <= 285.0 and abs(py) <= 215.0:
+            d_sc = _sd_rounded_box(px, py, 262.0, 184.0, 58.0)
+            d_tr = _sd_polygon(px, py, CENTER_PLAY_POLY) - 10.0
+            sa = 1.0 - _smoothstep(-1.1, 1.1, max(d_sc, -d_tr))
+            if sa > 0.0:
+                col = _blend_rgb(col, white, sa * 0.96)
+
+    elif motif == "social":
+        # Back-right tinted bubble + front-left bright rounded bubble with uniform azure dots
+        dot_blue = _hex_to_rgb01("#1D4ED8")
+        d_b2 = _sd_rounded_box(px - 76.0, py - 52.0, 164.0, 124.0, 54.0)
+        b2a = 1.0 - _smoothstep(-1.1, 1.1, d_b2)
+        if b2a > 0.0:
+            col = _blend_rgb(col, mint, b2a * 0.85)
+        d_b1 = _sd_rounded_box(px + 48.0, py + 44.0, 186.0, 142.0, 62.0)
+        b1a = 1.0 - _smoothstep(-1.1, 1.1, d_b1)
+        if b1a > 0.0:
+            col = _blend_rgb(col, white, b1a * 0.97)
+        d_dots = min(
+            _sd_circle(px + 108.0, py + 44.0, 22.0),
+            _sd_circle(px + 48.0, py + 44.0, 22.0),
+            _sd_circle(px - 12.0, py + 44.0, 22.0),
+        )
+        da = 1.0 - _smoothstep(-1.1, 1.1, d_dots)
+        if da > 0.0:
+            col = _blend_rgb(col, dot_blue, da)
+
+    elif motif == "tech":
+        # Precision search glass / dev lens with glowing core dot
+        d_lens = _sd_ring(px + 38.0, py + 38.0, 164.0, 32.0)
+        d_handle = _sd_segment(px, py, 80.0, 80.0, 214.0, 214.0) - 34.0
+        ta = 1.0 - _smoothstep(-1.1, 1.1, min(d_lens, d_handle))
+        if ta > 0.0:
+            col = _blend_rgb(col, white, ta * 0.95)
+        da = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px + 38.0, py + 38.0, 54.0))
+        if da > 0.0:
+            col = _blend_rgb(col, mint, da * 0.95)
+
+    elif motif == "apple_badge":
+        # Clean minimalist geometric device-cloud / orb + crisp titanium ring
+        d_orb = _sd_circle(px, py + 24.0, 184.0)
+        d_bite = _sd_circle(px - 178.0, py + 12.0, 82.0)
+        d_body = max(d_orb, -d_bite)
+        # Angled leaf above
+        lx, ly = px - 24.0, py + 224.0
+        d_leaf = math.hypot(lx * 0.8 + ly * 0.6, (lx * -0.6 + ly * 0.8) * 1.9) - 62.0
+        ba = 1.0 - _smoothstep(-1.1, 1.1, min(d_body, d_leaf))
+        if ba > 0.0:
+            col = _blend_rgb(col, slate_hi, ba * 0.96)
+
+    elif motif == "adblock":
+        d_oct = _sd_octagon(px, py, 248.0)
+        d_bar = _sd_rounded_box(px, py, 142.0, 34.0, 18.0)
+        aa = 1.0 - _smoothstep(-1.1, 1.1, max(d_oct, -d_bar))
+        if aa > 0.0:
+            col = _blend_rgb(col, white, aa * 0.96)
+
+    elif motif == "auto":
+        d_halo = _sd_ring(px, py, 286.0, 20.0)
+        ha = 1.0 - _smoothstep(-1.1, 1.1, d_halo)
+        if ha > 0.0:
+            col = _blend_rgb(col, gold, ha * 0.72)
+        if abs(px) <= 130.0 and abs(py) <= 230.0:
+            ba = 1.0 - _smoothstep(-1.1, 1.1, _sd_polygon(px, py, BOLT_POLY) - 8.0)
+            if ba > 0.0:
+                col = _blend_rgb(col, white, ba * 0.98)
+
+    return col
+
+
+def _render_icon(
+    name: str,
+    top_hex: str,
+    bot_hex: str,
+    motif: str,
+    squircle_alpha: bytearray,
+    outputs_unmasked: list[Path],
+    output_squircle: Path,
+) -> None:
+    top_rgb = _hex_to_rgb01(top_hex)
+    bot_rgb = _hex_to_rgb01(bot_hex)
 
     unmasked_px = bytearray(SIZE * SIZE * 3)
     squircle_px = bytearray(SIZE * SIZE * 4)
+
+    # Bounding circle for foreground art (every motif sits strictly inside r <= 370 px)
+    r_bound = 370
+    x_center = SIZE // 2
 
     for y in range(SIZE):
         py = (y + 0.5) - HALF
@@ -644,174 +1038,46 @@ def _render_icon(
         bg_r = top_rgb[0] * (1.0 - t) + bot_rgb[0] * t
         bg_g = top_rgb[1] * (1.0 - t) + bot_rgb[1] * t
         bg_b = top_rgb[2] * (1.0 - t) + bot_rgb[2] * t
+        bg_col = (bg_r, bg_g, bg_b)
 
+        br8 = int(round(_clamp(bg_r) * 255))
+        bg8 = int(round(_clamp(bg_g) * 255))
+        bb8 = int(round(_clamp(bg_b) * 255))
+
+        # Fast row initialization with flat background bytes
+        row3_start = y * SIZE * 3
+        unmasked_px[row3_start : row3_start + SIZE * 3] = bytes((br8, bg8, bb8)) * SIZE
+
+        row_alpha_start = y * SIZE
+        row4_start = y * SIZE * 4
+        squircle_px[row4_start : row4_start + SIZE * 4] = bytes((br8, bg8, bb8, 255)) * SIZE
         for x in range(SIZE):
+            a8 = squircle_alpha[row_alpha_start + x]
+            if a8 != 255:
+                squircle_px[row4_start + x * 4 + 3] = a8
+
+        if abs(py) > r_bound:
+            continue
+        dx_max = int(math.sqrt(r_bound * r_bound - py * py)) + 1
+        x_lo = max(0, x_center - dx_max)
+        x_hi = min(SIZE, x_center + dx_max + 1)
+
+        for x in range(x_lo, x_hi):
             px = (x + 0.5) - HALF
-            col = (bg_r, bg_g, bg_b)
-
-            # Fast outer bounding check: all foreground artwork sits inside Primary Circle (r<=410)
-            r2 = px * px + py * py
-            if r2 <= 460.0 * 460.0:
-                if motif == "myanmar":
-                    # Tazaungmon Full Moon disc in upper-right sky (100% inside 80% Primary Circle, clear of balloon)
-                    d_moon = math.hypot(px - 264.0, py + 252.0) - 34.0
-                    moon_a = 1.0 - _smoothstep(-1.1, 1.1, d_moon)
-                    if moon_a > 0.0:
-                        col = _blend_rgb(col, moon_silver, moon_a * 0.94)
-
-                    # Tazaungdaing Hot-Air Fire Balloon (Mee Pone Pyan) envelope with curved rib & clean star knockout
-                    if abs(px) <= 258.0 and -336.0 <= py <= 176.0:
-                        d_env = _sd_polygon(px, py, BALLOON_POLY)
-                        if d_env <= 4.0:
-                            d_rib = min(
-                                _sd_polyline(px, py, BALLOON_LEFT_RIB),
-                                _sd_polyline(px, py, BALLOON_RIGHT_RIB),
-                            ) - 10.0
-                            d_star_cut = _sd_polygon(px, py, BALLOON_STAR_POLY) - 4.0
-                            d_canopy = max(d_env, -d_rib, -d_star_cut)
-                            can_a = 1.0 - _smoothstep(-1.1, 1.1, d_canopy)
-                            if can_a > 0.0:
-                                env_t = _clamp((py + 328.0) / 485.0)
-                                env_rgb = (
-                                    lantern_warm[0] * (1.0 - env_t) + gold[0] * env_t,
-                                    lantern_warm[1] * (1.0 - env_t) + gold[1] * env_t,
-                                    lantern_warm[2] * (1.0 - env_t) + gold[2] * env_t,
-                                )
-                                col = _blend_rgb(col, env_rgb, can_a)
-
-                    # Hanging burner rim bar & glowing flame drop
-                    if abs(px) <= 130.0 and 164.0 <= py <= 345.0:
-                        d_rim = _sd_rounded_box(px, py - 186.0, 108.0, 11.0, 10.0)
-                        rim_a = 1.0 - _smoothstep(-1.1, 1.1, d_rim)
-                        if rim_a > 0.0:
-                            col = _blend_rgb(col, white, rim_a * 0.95)
-                        d_flame = _sd_polygon(px, py, FLAME_POLY)
-                        fl_a = 1.0 - _smoothstep(-1.1, 1.1, d_flame)
-                        if fl_a > 0.0:
-                            col = _blend_rgb(col, amber, fl_a)
-                        d_flame_core = _sd_circle(px, py - 284.0, 18.0)
-                        fc_a = 1.0 - _smoothstep(-1.1, 1.1, d_flame_core)
-                        if fc_a > 0.0:
-                            col = _blend_rgb(col, lantern_warm, fc_a)
-
-                elif motif == "ai":
-                    # Dual diagonal orbital arcs + smooth 4-point astroid spark with core aperture
-                    d_arc1 = _sd_arc(px, py, 336.0, 26.0, -45.0, 56.0)
-                    d_arc2 = _sd_arc(px, py, 336.0, 26.0, 135.0, 56.0)
-                    arc_a = 1.0 - _smoothstep(-1.1, 1.1, min(d_arc1, d_arc2))
-                    if arc_a > 0.0:
-                        col = _blend_rgb(col, white, arc_a * 0.55)
-                    if abs(px) <= 245.0 and abs(py) <= 245.0:
-                        d_ast = _sd_polygon(px, py, ASTROID_POLY) - 10.0
-                        d_hole = _sd_circle(px, py, 44.0)
-                        d_shape = max(d_ast, -d_hole)
-                        sp_a = 1.0 - _smoothstep(-1.1, 1.1, d_shape)
-                        if sp_a > 0.0:
-                            col = _blend_rgb(col, white, sp_a * 0.98)
-                        core_a = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px, py, 24.0))
-                        if core_a > 0.0:
-                            col = _blend_rgb(col, mint, core_a)
-
-                elif motif == "pixel":
-                    # 3x3 grid of rounded tiles with clean knockout channel around diagonal block slash
-                    d_slash_core = _sd_segment(px, py, -264.0, 264.0, 264.0, -264.0) - 30.0
-                    d_slash_gap = d_slash_core - 28.0
-                    if abs(px) <= 250.0 and abs(py) <= 250.0:
-                        d_tiles = 1e9
-                        for gx in (-164.0, 0.0, 164.0):
-                            if abs(px - gx) > 68.0:
-                                continue
-                            for gy in (-164.0, 0.0, 164.0):
-                                if abs(py - gy) > 68.0:
-                                    continue
-                                d_tiles = min(d_tiles, _sd_rounded_box(px - gx, py - gy, 60.0, 60.0, 18.0))
-                        d_tiles_cut = max(d_tiles, -d_slash_gap)
-                        tile_a = 1.0 - _smoothstep(-1.1, 1.1, d_tiles_cut)
-                        if tile_a > 0.0:
-                            col = _blend_rgb(col, white, tile_a * 0.92)
-                    slash_a = 1.0 - _smoothstep(-1.1, 1.1, d_slash_core)
-                    if slash_a > 0.0:
-                        col = _blend_rgb(col, coral, slash_a)
-
-                elif motif == "shield":
-                    # Apple-grid symmetric cubic-bezier shield with knockout checkmark
-                    if abs(px) <= 295.0 and abs(py) <= 355.0:
-                        d_sh = _sd_polygon(px, py, SHIELD_POLY)
-                        d_c1 = _sd_segment(px, py, -110.0, 6.0, -22.0, 96.0) - 34.0
-                        d_c2 = _sd_segment(px, py, -22.0, 96.0, 128.0, -76.0) - 34.0
-                        d_chk = min(d_c1, d_c2)
-                        d_final = max(d_sh, -d_chk)
-                        sh_a = 1.0 - _smoothstep(-1.1, 1.1, d_final)
-                        if sh_a > 0.0:
-                            col = _blend_rgb(col, white, sh_a * 0.96)
-
-                elif motif == "youtube":
-                    # Play frame with negative-space triangle + dual-subtitle stacked bars
-                    if abs(px) <= 280.0 and -215.0 <= py <= 145.0:
-                        d_screen = _sd_rounded_box(px, py + 34.0, 260.0, 164.0, 64.0)
-                        d_play = _sd_polygon(px, py, PLAY_TRI_POLY) - 10.0
-                        d_cut = max(d_screen, -d_play)
-                        sc_a = 1.0 - _smoothstep(-1.1, 1.1, d_cut)
-                        if sc_a > 0.0:
-                            col = _blend_rgb(col, white, sc_a * 0.96)
-                    if abs(px) <= 240.0 and 155.0 <= py <= 315.0:
-                        d_bar1 = _sd_rounded_box(px, py - 186.0, 196.0, 18.0, 16.0)
-                        b1_a = 1.0 - _smoothstep(-1.1, 1.1, d_bar1)
-                        if b1_a > 0.0:
-                            col = _blend_rgb(col, white, b1_a * 0.94)
-                        d_bar2 = _sd_rounded_box(px, py - 246.0, 142.0, 18.0, 16.0)
-                        b2_a = 1.0 - _smoothstep(-1.1, 1.1, d_bar2)
-                        if b2_a > 0.0:
-                            col = _blend_rgb(col, gold, b2_a * 0.98)
-
-                elif motif == "linkcheck":
-                    d_l1 = _sd_segment(px, py, -210.0, 90.0, 0.0, -140.0) - 24.0
-                    d_l2 = _sd_segment(px, py, 0.0, -140.0, 210.0, 90.0) - 24.0
-                    l_a = 1.0 - _smoothstep(-1.1, 1.1, min(d_l1, d_l2))
-                    if l_a > 0.0:
-                        col = _blend_rgb(col, white, l_a * 0.65)
-                    for cx, cy, cr, accent in ((-210.0, 90.0, 74.0, white), (0.0, -140.0, 82.0, mint), (210.0, 90.0, 74.0, white)):
-                        na = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px - cx, py - cy, cr))
-                        if na > 0.0:
-                            col = _blend_rgb(col, accent, na * 0.96)
-
-                elif motif == "geo":
-                    d_ring = _sd_ring(px, py, 240.0, 26.0)
-                    d_eq = _sd_rounded_box(px, py, 240.0, 18.0, 10.0)
-                    d_mer = _sd_rounded_box(px, py, 18.0, 240.0, 10.0)
-                    ga = 1.0 - _smoothstep(-1.1, 1.1, min(d_ring, d_eq, d_mer))
-                    if ga > 0.0:
-                        col = _blend_rgb(col, white, ga * 0.92)
-                    ca = 1.0 - _smoothstep(-1.1, 1.1, _sd_circle(px, py, 64.0))
-                    if ca > 0.0:
-                        col = _blend_rgb(col, mint, ca * 0.98)
-
-                elif motif == "media":
-                    if abs(px) <= 290.0 and abs(py) <= 230.0:
-                        d_box = _sd_rounded_box(px, py, 260.0, 186.0, 56.0)
-                        d_c1 = _sd_segment(px, py, -110.0, 10.0, -24.0, 96.0) - 30.0
-                        d_c2 = _sd_segment(px, py, -24.0, 96.0, 128.0, -78.0) - 30.0
-                        ma = 1.0 - _smoothstep(-1.1, 1.1, max(d_box, -min(d_c1, d_c2)))
-                        if ma > 0.0:
-                            col = _blend_rgb(col, white, ma * 0.96)
-
+            col = _motif_pixel(motif, px, py, bg_col)
+            if col is bg_col:
+                continue
             r8 = int(round(_clamp(col[0]) * 255))
             g8 = int(round(_clamp(col[1]) * 255))
             b8 = int(round(_clamp(col[2]) * 255))
-
-            idx3 = (y * SIZE + x) * 3
-            unmasked_px[idx3] = r8
-            unmasked_px[idx3 + 1] = g8
-            unmasked_px[idx3 + 2] = b8
-
-            # Apple G^2 Continuous-Curvature Squircle mask
-            d_sq = squircle_sd(px, py)
-            sq_a = 1.0 - _smoothstep(-1.1, 1.1, d_sq)
-            idx4 = (y * SIZE + x) * 4
-            squircle_px[idx4] = r8
-            squircle_px[idx4 + 1] = g8
-            squircle_px[idx4 + 2] = b8
-            squircle_px[idx4 + 3] = int(round(sq_a * 255))
+            i3 = row3_start + x * 3
+            unmasked_px[i3] = r8
+            unmasked_px[i3 + 1] = g8
+            unmasked_px[i3 + 2] = b8
+            i4 = row4_start + x * 4
+            squircle_px[i4] = r8
+            squircle_px[i4 + 1] = g8
+            squircle_px[i4 + 2] = b8
 
     for out in outputs_unmasked:
         _write_png(out, SIZE, SIZE, unmasked_px, rgba=False)
@@ -838,10 +1104,7 @@ def _generate_all_svgs() -> None:
         "</mask>",
     ]
     _write_svgs(
-        "myanmar-essential",
-        "#0B163D",
-        "#2F235C",
-        defs_extra=bal_defs,
+        "myanmar-essential", "#0B163D", "#2F235C", defs_extra=bal_defs,
         fg_elements_color=[
             '<circle cx="776" cy="260" r="34" fill="#FDE68A" opacity="0.94"/>',
             f'<path d="{bal_d}" fill="url(#balloon-grad)" mask="url(#balloon-cut)"/>',
@@ -857,7 +1120,6 @@ def _generate_all_svgs() -> None:
         ],
     )
 
-    # 2. Google AI & Auth Routing SVG
     ai_a1 = _svg_arc_path(HALF, HALF, 336.0, -101.0, 11.0)
     ai_a2 = _svg_arc_path(HALF, HALF, 336.0, 79.0, 191.0)
     ast_d = _svg_poly_path(ASTROID_POLY)
@@ -865,45 +1127,41 @@ def _generate_all_svgs() -> None:
         '<mask id="ai-cut">',
         '  <rect width="1024" height="1024" fill="white"/>',
         '  <circle cx="512" cy="512" r="44" fill="black"/>',
-        '</mask>',
+        "</mask>",
     ]
-    _write_svgs(
-        "google-ai-auth-proxy",
-        "#183B8C",
-        "#0C707D",
-        defs_extra=ai_mask,
-        fg_elements_color=[
-            f'<path d="{ai_a1}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.55"/>',
-            f'<path d="{ai_a2}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.55"/>',
-            f'<path d="{ast_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="20" stroke-linejoin="round" mask="url(#ai-cut)" opacity="0.98"/>',
-            '<circle cx="512" cy="512" r="24" fill="#5CF2D6"/>',
-        ],
-        fg_elements_mono=[
-            f'<path d="{ai_a1}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.65"/>',
-            f'<path d="{ai_a2}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.65"/>',
-            f'<path d="{ast_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="20" stroke-linejoin="round" mask="url(#ai-cut)"/>',
-            '<circle cx="512" cy="512" r="24" fill="#FFFFFF"/>',
-        ],
-    )
+    for nm, c_top, c_bot in (
+        ("google-ai-auth-proxy", "#183B8C", "#0C707D"),
+        ("policy-ai", "#183B8C", "#0C707D"),
+    ):
+        _write_svgs(
+            nm, c_top, c_bot, defs_extra=ai_mask,
+            fg_elements_color=[
+                f'<path d="{ai_a1}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.55"/>',
+                f'<path d="{ai_a2}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.55"/>',
+                f'<path d="{ast_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="20" stroke-linejoin="round" mask="url(#ai-cut)" opacity="0.98"/>',
+                '<circle cx="512" cy="512" r="24" fill="#5CF2D6"/>',
+            ],
+            fg_elements_mono=[
+                f'<path d="{ai_a1}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.65"/>',
+                f'<path d="{ai_a2}" fill="none" stroke="#FFFFFF" stroke-width="52" stroke-linecap="round" opacity="0.65"/>',
+                f'<path d="{ast_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="20" stroke-linejoin="round" mask="url(#ai-cut)"/>',
+                '<circle cx="512" cy="512" r="24" fill="#FFFFFF"/>',
+            ],
+        )
 
-    # 3. Meta Pixel MitM SVG
-    tiles = []
-    for gx in (-164, 0, 164):
-        for gy in (-164, 0, 164):
-            x0 = 512 + gx - 60
-            y0 = 512 + gy - 60
-            tiles.append(f'<rect x="{x0}" y="{y0}" width="120" height="120" rx="18" fill="#FFFFFF"/>')
+    tiles = [
+        f'<rect x="{512 + gx - 60}" y="{512 + gy - 60}" width="120" height="120" rx="18" fill="#FFFFFF"/>'
+        for gx in (-164, 0, 164)
+        for gy in (-164, 0, 164)
+    ]
     pixel_mask = [
         '<mask id="pixel-cut">',
         '  <rect width="1024" height="1024" fill="white"/>',
         '  <line x1="248" y1="776" x2="776" y2="248" stroke="black" stroke-width="116" stroke-linecap="round"/>',
-        '</mask>',
+        "</mask>",
     ]
     _write_svgs(
-        "meta-pixel-mitm",
-        "#2D2166",
-        "#5E1A66",
-        defs_extra=pixel_mask,
+        "meta-pixel-mitm", "#2D2166", "#5E1A66", defs_extra=pixel_mask,
         fg_elements_color=[
             f'<g mask="url(#pixel-cut)" opacity="0.92">{"".join(tiles)}</g>',
             '<line x1="248" y1="776" x2="776" y2="248" stroke="#FF5263" stroke-width="60" stroke-linecap="round"/>',
@@ -914,24 +1172,19 @@ def _generate_all_svgs() -> None:
         ],
     )
 
-    # 4. Telemetry Shield SVG
     sh_d = _svg_poly_path(SHIELD_POLY)
     sh_mask = [
         '<mask id="shield-cut">',
         '  <rect width="1024" height="1024" fill="white"/>',
         '  <path d="M 402 518 L 490 608 L 640 436" fill="none" stroke="black" stroke-width="68" stroke-linecap="round" stroke-linejoin="round"/>',
-        '</mask>',
+        "</mask>",
     ]
     _write_svgs(
-        "telemetry-shield",
-        "#0B5E58",
-        "#0D2E5C",
-        defs_extra=sh_mask,
+        "telemetry-shield", "#0B5E58", "#0D2E5C", defs_extra=sh_mask,
         fg_elements_color=[f'<path d="{sh_d}" fill="#FFFFFF" mask="url(#shield-cut)" opacity="0.96"/>'],
         fg_elements_mono=[f'<path d="{sh_d}" fill="#FFFFFF" mask="url(#shield-cut)"/>'],
     )
 
-    # 5. YouTube Myanmar & DualSub SVG
     play_d = _svg_poly_path(PLAY_TRI_POLY)
     yt_mask = [
         '<mask id="yt-cut">',
@@ -940,10 +1193,7 @@ def _generate_all_svgs() -> None:
         "</mask>",
     ]
     _write_svgs(
-        "youtube-myanmar-enhance",
-        "#9B142C",
-        "#4A0D36",
-        defs_extra=yt_mask,
+        "youtube-myanmar-enhance", "#9B142C", "#4A0D36", defs_extra=yt_mask,
         fg_elements_color=[
             '<rect x="252" y="314" width="520" height="328" rx="64" fill="#FFFFFF" mask="url(#yt-cut)" opacity="0.96"/>',
             '<rect x="316" y="680" width="392" height="36" rx="16" fill="#FFFFFF" opacity="0.94"/>',
@@ -956,10 +1206,23 @@ def _generate_all_svgs() -> None:
         ],
     )
 
+    cplay_d = _svg_poly_path(CENTER_PLAY_POLY)
     _write_svgs(
-        "node-link-check",
-        "#0D4F8B",
-        "#10244E",
+        "youtube-music-myanmar", "#B91C1C", "#6D1252",
+        fg_elements_color=[
+            '<circle cx="512" cy="512" r="246" fill="none" stroke="#FFFFFF" stroke-width="44" opacity="0.95"/>',
+            '<circle cx="512" cy="512" r="168" fill="none" stroke="#FFD452" stroke-width="24" opacity="0.96"/>',
+            f'<path d="{cplay_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round"/>',
+        ],
+        fg_elements_mono=[
+            '<circle cx="512" cy="512" r="246" fill="none" stroke="#FFFFFF" stroke-width="44"/>',
+            '<circle cx="512" cy="512" r="168" fill="none" stroke="#FFFFFF" stroke-width="24" opacity="0.8"/>',
+            f'<path d="{cplay_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round"/>',
+        ],
+    )
+
+    _write_svgs(
+        "node-link-check", "#0D4F8B", "#10244E",
         fg_elements_color=[
             '<line x1="302" y1="602" x2="512" y2="372" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.65"/>',
             '<line x1="512" y1="372" x2="722" y2="602" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" opacity="0.65"/>',
@@ -976,114 +1239,193 @@ def _generate_all_svgs() -> None:
         ],
     )
 
-    _write_svgs(
-        "geo-location",
-        "#0F6A52",
-        "#0D2C44",
-        fg_elements_color=[
-            '<circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-width="52" opacity="0.92"/>',
-            '<rect x="272" y="494" width="480" height="36" rx="10" fill="#FFFFFF" opacity="0.92"/>',
-            '<rect x="494" y="272" width="36" height="480" rx="10" fill="#FFFFFF" opacity="0.92"/>',
-            '<circle cx="512" cy="512" r="64" fill="#5CF2D6" opacity="0.98"/>',
-        ],
-        fg_elements_mono=[
-            '<circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-width="52"/>',
-            '<rect x="272" y="494" width="480" height="36" rx="10" fill="#FFFFFF"/>',
-            '<rect x="494" y="272" width="36" height="480" rx="10" fill="#FFFFFF"/>',
-            '<circle cx="512" cy="512" r="64" fill="#FFFFFF"/>',
-        ],
-    )
+    for nm, t_h, b_h in (("geo-location", "#0F6A52", "#0D2C44"), ("policy-others", "#065F46", "#172554")):
+        _write_svgs(
+            nm, t_h, b_h,
+            fg_elements_color=[
+                '<circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-width="52" opacity="0.92"/>',
+                '<rect x="272" y="494" width="480" height="36" rx="10" fill="#FFFFFF" opacity="0.92"/>',
+                '<rect x="494" y="272" width="36" height="480" rx="10" fill="#FFFFFF" opacity="0.92"/>',
+                '<circle cx="512" cy="512" r="64" fill="#5CF2D6" opacity="0.98"/>',
+            ],
+            fg_elements_mono=[
+                '<circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-width="52"/>',
+                '<rect x="272" y="494" width="480" height="36" rx="10" fill="#FFFFFF"/>',
+                '<rect x="494" y="272" width="36" height="480" rx="10" fill="#FFFFFF"/>',
+                '<circle cx="512" cy="512" r="64" fill="#FFFFFF"/>',
+            ],
+        )
 
     mc_mask = [
         '<mask id="media-cut">',
         '  <rect width="1024" height="1024" fill="white"/>',
         '  <path d="M 402 522 L 488 608 L 640 434" fill="none" stroke="black" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>',
-        '</mask>',
+        "</mask>",
     ]
     _write_svgs(
-        "media-checker",
-        "#5B247A",
-        "#1B1F4F",
-        defs_extra=mc_mask,
+        "media-checker", "#5B247A", "#1B1F4F", defs_extra=mc_mask,
         fg_elements_color=['<rect x="252" y="326" width="520" height="372" rx="56" fill="#FFFFFF" mask="url(#media-cut)" opacity="0.96"/>'],
         fg_elements_mono=['<rect x="252" y="326" width="520" height="372" rx="56" fill="#FFFFFF" mask="url(#media-cut)"/>'],
     )
 
+    _write_svgs(
+        "policy-shadowshare", "#1B1F6B", "#0D6E6E",
+        fg_elements_color=[
+            '<circle cx="444" cy="512" r="166" fill="none" stroke="#FFFFFF" stroke-width="56" opacity="0.94"/>',
+            '<circle cx="580" cy="512" r="166" fill="none" stroke="#FFFFFF" stroke-width="56" opacity="0.94"/>',
+            '<polygon points="512,433 591,512 512,591 433,512" fill="#5CF2D6"/>',
+        ],
+        fg_elements_mono=[
+            '<circle cx="444" cy="512" r="166" fill="none" stroke="#FFFFFF" stroke-width="56"/>',
+            '<circle cx="580" cy="512" r="166" fill="none" stroke="#FFFFFF" stroke-width="56"/>',
+        ],
+    )
+
+    st_mask = [
+        '<mask id="st-cut">',
+        '  <rect width="1024" height="1024" fill="white"/>',
+        f'  <path d="{cplay_d}" fill="black" stroke="black" stroke-width="20" stroke-linejoin="round"/>',
+        "</mask>",
+    ]
+    _write_svgs(
+        "policy-streaming", "#9B142C", "#4A0D36", defs_extra=st_mask,
+        fg_elements_color=['<rect x="250" y="328" width="524" height="368" rx="58" fill="#FFFFFF" mask="url(#st-cut)" opacity="0.96"/>'],
+        fg_elements_mono=['<rect x="250" y="328" width="524" height="368" rx="58" fill="#FFFFFF" mask="url(#st-cut)"/>'],
+    )
+
+    _write_svgs(
+        "policy-social", "#1D4ED8", "#5B21B6",
+        fg_elements_color=[
+            '<rect x="424" y="440" width="328" height="248" rx="54" fill="#5CF2D6" opacity="0.85"/>',
+            '<rect x="278" y="326" width="372" height="284" rx="62" fill="#FFFFFF" opacity="0.97"/>',
+            '<circle cx="404" cy="468" r="22" fill="#1D4ED8"/><circle cx="464" cy="468" r="22" fill="#1D4ED8"/><circle cx="524" cy="468" r="22" fill="#1D4ED8"/>',
+        ],
+        fg_elements_mono=[
+            '<rect x="424" y="440" width="328" height="248" rx="54" fill="#FFFFFF" opacity="0.6"/>',
+            '<rect x="278" y="326" width="372" height="284" rx="62" fill="#FFFFFF"/>',
+        ],
+    )
+
+    _write_svgs(
+        "policy-tech", "#1E3A5F", "#0F6A8B",
+        fg_elements_color=[
+            '<circle cx="474" cy="474" r="164" fill="none" stroke="#FFFFFF" stroke-width="64" opacity="0.95"/>',
+            '<line x1="592" y1="592" x2="726" y2="726" stroke="#FFFFFF" stroke-width="68" stroke-linecap="round"/>',
+            '<circle cx="474" cy="474" r="54" fill="#5CF2D6" opacity="0.95"/>',
+        ],
+        fg_elements_mono=[
+            '<circle cx="474" cy="474" r="164" fill="none" stroke="#FFFFFF" stroke-width="64"/>',
+            '<line x1="592" y1="592" x2="726" y2="726" stroke="#FFFFFF" stroke-width="68" stroke-linecap="round"/>',
+        ],
+    )
+
+    _write_svgs(
+        "policy-apple", "#3A4659", "#0F172A",
+        fg_elements_color=[
+            '<circle cx="512" cy="488" r="184" fill="#E2E8F0" opacity="0.96"/>',
+            '<ellipse cx="536" cy="288" rx="34" ry="58" transform="rotate(-35 536 288)" fill="#E2E8F0"/>',
+        ],
+        fg_elements_mono=[
+            '<circle cx="512" cy="488" r="184" fill="#FFFFFF"/>',
+            '<ellipse cx="536" cy="288" rx="34" ry="58" transform="rotate(-35 536 288)" fill="#FFFFFF"/>',
+        ],
+    )
+
+    oct_pts = " ".join(
+        f"{HALF + 268.0 * math.cos(math.pi / 8.0 + i * math.pi / 4.0):.2f},{HALF + 268.0 * math.sin(math.pi / 8.0 + i * math.pi / 4.0):.2f}"
+        for i in range(8)
+    )
+    _write_svgs(
+        "policy-adblock", "#991B1B", "#271019",
+        defs_extra=['<mask id="ad-cut"><rect width="1024" height="1024" fill="white"/><rect x="370" y="478" width="284" height="68" rx="18" fill="black"/></mask>'],
+        fg_elements_color=[f'<polygon points="{oct_pts}" fill="#FFFFFF" mask="url(#ad-cut)" opacity="0.96"/>'],
+        fg_elements_mono=[f'<polygon points="{oct_pts}" fill="#FFFFFF" mask="url(#ad-cut)"/>'],
+    )
+
+    bolt_d = _svg_poly_path(BOLT_POLY)
+    _write_svgs(
+        "policy-auto", "#D97706", "#1E1B4B",
+        fg_elements_color=[
+            '<circle cx="512" cy="512" r="286" fill="none" stroke="#FFD452" stroke-width="40" opacity="0.72"/>',
+            f'<path d="{bolt_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14" stroke-linejoin="round"/>',
+        ],
+        fg_elements_mono=[
+            '<circle cx="512" cy="512" r="286" fill="none" stroke="#FFFFFF" stroke-width="40" opacity="0.72"/>',
+            f'<path d="{bolt_d}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14" stroke-linejoin="round"/>',
+        ],
+    )
+
+    for code, acc in (
+        ("policy-sg", "#E11D48"),
+        ("policy-us", "#1E3A8A"),
+        ("policy-jp", "#DC2626"),
+        ("policy-hk", "#E11D48"),
+        ("policy-kr", "#1D4ED8"),
+        ("policy-ca", "#DC2626"),
+        ("policy-nl", "#DC2626"),
+        ("policy-fr", "#1D4ED8"),
+        ("policy-de", "#FACC15"),
+        ("policy-uk", "#1E3A8A"),
+    ):
+        _write_svgs(
+            code, "#17223B", "#0B1120",
+            fg_elements_color=[
+                '<circle cx="512" cy="512" r="256" fill="none" stroke="#CBD5E1" stroke-width="20" opacity="0.75"/>',
+                f'<circle cx="512" cy="512" r="244" fill="{acc}" opacity="0.95"/>',
+            ],
+            fg_elements_mono=['<circle cx="512" cy="512" r="244" fill="#FFFFFF"/>'],
+        )
+
+
+ICON_SPECS = [
+    ("myanmar-essential", "#0B163D", "#2F235C", "myanmar", [ROOT / "icon.png", ROOT / "assets/icons/myanmar-essential.png"], ROOT / "assets/icons/squircle/myanmar-essential.png"),
+    ("google-ai-auth-proxy", "#183B8C", "#0C707D", "ai", [ROOT / "assets/icons/google-ai-auth-proxy.png"], ROOT / "assets/icons/squircle/google-ai-auth-proxy.png"),
+    ("meta-pixel-mitm", "#2D2166", "#5E1A66", "pixel", [ROOT / "assets/icons/meta-pixel-mitm.png"], ROOT / "assets/icons/squircle/meta-pixel-mitm.png"),
+    ("telemetry-shield", "#0B5E58", "#0D2E5C", "shield", [ROOT / "assets/icons/telemetry-shield.png"], ROOT / "assets/icons/squircle/telemetry-shield.png"),
+    ("youtube-myanmar-enhance", "#9B142C", "#4A0D36", "youtube", [ROOT / "assets/icons/youtube-myanmar-enhance.png"], ROOT / "assets/icons/squircle/youtube-myanmar-enhance.png"),
+    ("youtube-music-myanmar", "#B91C1C", "#6D1252", "ytmusic", [ROOT / "assets/icons/youtube-music-myanmar.png"], ROOT / "assets/icons/squircle/youtube-music-myanmar.png"),
+    ("node-link-check", "#0D4F8B", "#10244E", "linkcheck", [ROOT / "assets/icons/node-link-check.png"], ROOT / "assets/icons/squircle/node-link-check.png"),
+    ("geo-location", "#0F6A52", "#0D2C44", "geo", [ROOT / "assets/icons/geo-location.png"], ROOT / "assets/icons/squircle/geo-location.png"),
+    ("media-checker", "#5B247A", "#1B1F4F", "media", [ROOT / "assets/icons/media-checker.png"], ROOT / "assets/icons/squircle/media-checker.png"),
+    ("policy-shadowshare", "#1B1F6B", "#0D6E6E", "shadowshare", [ROOT / "assets/icons/policy-shadowshare.png"], ROOT / "assets/icons/squircle/policy-shadowshare.png"),
+    ("policy-ai", "#183B8C", "#0C707D", "ai", [ROOT / "assets/icons/policy-ai.png"], ROOT / "assets/icons/squircle/policy-ai.png"),
+    ("policy-streaming", "#9B142C", "#4A0D36", "streaming", [ROOT / "assets/icons/policy-streaming.png"], ROOT / "assets/icons/squircle/policy-streaming.png"),
+    ("policy-social", "#1D4ED8", "#5B21B6", "social", [ROOT / "assets/icons/policy-social.png"], ROOT / "assets/icons/squircle/policy-social.png"),
+    ("policy-tech", "#1E3A5F", "#0F6A8B", "tech", [ROOT / "assets/icons/policy-tech.png"], ROOT / "assets/icons/squircle/policy-tech.png"),
+    ("policy-apple", "#3A4659", "#0F172A", "apple_badge", [ROOT / "assets/icons/policy-apple.png"], ROOT / "assets/icons/squircle/policy-apple.png"),
+    ("policy-adblock", "#991B1B", "#271019", "adblock", [ROOT / "assets/icons/policy-adblock.png"], ROOT / "assets/icons/squircle/policy-adblock.png"),
+    ("policy-auto", "#D97706", "#1E1B4B", "auto", [ROOT / "assets/icons/policy-auto.png"], ROOT / "assets/icons/squircle/policy-auto.png"),
+    ("policy-others", "#065F46", "#172554", "geo", [ROOT / "assets/icons/policy-others.png"], ROOT / "assets/icons/squircle/policy-others.png"),
+    ("policy-sg", "#17223B", "#0B1120", "flag_sg", [ROOT / "assets/icons/policy-sg.png"], ROOT / "assets/icons/squircle/policy-sg.png"),
+    ("policy-us", "#17223B", "#0B1120", "flag_us", [ROOT / "assets/icons/policy-us.png"], ROOT / "assets/icons/squircle/policy-us.png"),
+    ("policy-jp", "#17223B", "#0B1120", "flag_jp", [ROOT / "assets/icons/policy-jp.png"], ROOT / "assets/icons/squircle/policy-jp.png"),
+    ("policy-hk", "#17223B", "#0B1120", "flag_hk", [ROOT / "assets/icons/policy-hk.png"], ROOT / "assets/icons/squircle/policy-hk.png"),
+    ("policy-kr", "#17223B", "#0B1120", "flag_kr", [ROOT / "assets/icons/policy-kr.png"], ROOT / "assets/icons/squircle/policy-kr.png"),
+    ("policy-ca", "#17223B", "#0B1120", "flag_ca", [ROOT / "assets/icons/policy-ca.png"], ROOT / "assets/icons/squircle/policy-ca.png"),
+    ("policy-nl", "#17223B", "#0B1120", "flag_nl", [ROOT / "assets/icons/policy-nl.png"], ROOT / "assets/icons/squircle/policy-nl.png"),
+    ("policy-fr", "#17223B", "#0B1120", "flag_fr", [ROOT / "assets/icons/policy-fr.png"], ROOT / "assets/icons/squircle/policy-fr.png"),
+    ("policy-de", "#17223B", "#0B1120", "flag_de", [ROOT / "assets/icons/policy-de.png"], ROOT / "assets/icons/squircle/policy-de.png"),
+    ("policy-uk", "#17223B", "#0B1120", "flag_uk", [ROOT / "assets/icons/policy-uk.png"], ROOT / "assets/icons/squircle/policy-uk.png"),
+]
+
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate Apple HIG plugin & policy icons.")
+    parser.add_argument("--only", help="Comma-separated icon names to render.")
+    parser.add_argument("--missing-only", action="store_true", help="Only render icons missing on disk.")
+    args = parser.parse_args()
+
     write_grid_overlay_svg()
     _generate_all_svgs()
-    squircle_sd = _build_squircle_sd()
+    squircle_alpha = _precompute_squircle_alpha()
 
-    specs = [
-        (
-            "myanmar-essential",
-            "#0B163D",
-            "#2F235C",
-            "myanmar",
-            [ROOT / "icon.png", ROOT / "assets/icons/myanmar-essential.png"],
-            ROOT / "assets/icons/squircle/myanmar-essential.png",
-        ),
-        (
-            "google-ai-auth-proxy",
-            "#183B8C",
-            "#0C707D",
-            "ai",
-            [ROOT / "assets/icons/google-ai-auth-proxy.png"],
-            ROOT / "assets/icons/squircle/google-ai-auth-proxy.png",
-        ),
-        (
-            "meta-pixel-mitm",
-            "#2D2166",
-            "#5E1A66",
-            "pixel",
-            [ROOT / "assets/icons/meta-pixel-mitm.png"],
-            ROOT / "assets/icons/squircle/meta-pixel-mitm.png",
-        ),
-        (
-            "telemetry-shield",
-            "#0B5E58",
-            "#0D2E5C",
-            "shield",
-            [ROOT / "assets/icons/telemetry-shield.png"],
-            ROOT / "assets/icons/squircle/telemetry-shield.png",
-        ),
-        (
-            "youtube-myanmar-enhance",
-            "#9B142C",
-            "#4A0D36",
-            "youtube",
-            [ROOT / "assets/icons/youtube-myanmar-enhance.png"],
-            ROOT / "assets/icons/squircle/youtube-myanmar-enhance.png",
-        ),
-        (
-            "node-link-check",
-            "#0D4F8B",
-            "#10244E",
-            "linkcheck",
-            [ROOT / "assets/icons/node-link-check.png"],
-            ROOT / "assets/icons/squircle/node-link-check.png",
-        ),
-        (
-            "geo-location",
-            "#0F6A52",
-            "#0D2C44",
-            "geo",
-            [ROOT / "assets/icons/geo-location.png"],
-            ROOT / "assets/icons/squircle/geo-location.png",
-        ),
-        (
-            "media-checker",
-            "#5B247A",
-            "#1B1F4F",
-            "media",
-            [ROOT / "assets/icons/media-checker.png"],
-            ROOT / "assets/icons/squircle/media-checker.png",
-        ),
-    ]
-
-    for name, top_hex, bot_hex, motif, unmasked_outs, squircle_out in specs:
-        _render_icon(name, top_hex, bot_hex, motif, squircle_sd, unmasked_outs, squircle_out)
+    selected = {x.strip() for x in args.only.split(",")} if args.only else None
+    for name, top_hex, bot_hex, motif, unmasked_outs, squircle_out in ICON_SPECS:
+        if selected is not None and name not in selected:
+            continue
+        if args.missing_only and squircle_out.is_file() and all(p.is_file() for p in unmasked_outs):
+            continue
+        _render_icon(name, top_hex, bot_hex, motif, squircle_alpha, unmasked_outs, squircle_out)
         print(f"Generated 1024px unmasked + G^2 squircle + SVGs for {name}")
 
 

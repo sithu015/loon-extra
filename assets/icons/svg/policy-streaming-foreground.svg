@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+<mask id="st-cut">
+  <rect width="1024" height="1024" fill="white"/>
+  <path d="M 460.00 426.00 L 598.00 512.00 L 460.00 598.00 Z" fill="black" stroke="black" stroke-width="20" stroke-linejoin="round"/>
+</mask>
+  </defs>
+  <g id="foreground">
+    <rect x="250" y="328" width="524" height="368" rx="58" fill="#FFFFFF" mask="url(#st-cut)"/>
+  </g>
+</svg>

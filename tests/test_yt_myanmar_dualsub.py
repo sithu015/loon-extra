@@ -14,8 +14,10 @@ class YouTubeMyanmarDualSubTests(unittest.TestCase):
     def test_node_unit_suite_passes(self) -> None:
         node = shutil.which("node")
         self.assertIsNotNone(node, "Node.js is required to run JS unit tests")
+        js_tests = [str(p.relative_to(ROOT)) for p in sorted((ROOT / "tests" / "js").glob("*.test.mjs"))]
+        self.assertTrue(js_tests, "Expected at least one *.test.mjs file under tests/js/")
         res = subprocess.run(
-            [node, "--test", "tests/js/yt_plugin.test.mjs"],
+            [node, "--test", *js_tests],
             cwd=ROOT,
             capture_output=True,
             text=True,

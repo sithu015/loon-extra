@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+
+  </defs>
+  <g id="foreground">
+    <circle cx="512" cy="512" r="286" fill="none" stroke="#FFFFFF" stroke-width="40" opacity="0.72"/><path d="M 556.00 298.00 L 400.00 530.00 L 506.00 530.00 L 468.00 726.00 L 624.00 494.00 L 518.00 494.00 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14" stroke-linejoin="round"/>
+  </g>
+</svg>
