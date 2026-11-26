@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="./icon.png" width="108" alt="Myanmar Essential Loon Extra Icon" />
+  <img src="./assets/icons/squircle/myanmar-essential.png" width="108" alt="Myanmar Essential Loon Extra Icon" />
+  <img src="./assets/icons/squircle/google-ai-auth-proxy.png" width="108" alt="Google AI & Auth Routing Icon" />
+  <img src="./assets/icons/squircle/meta-pixel-mitm.png" width="108" alt="Meta Pixel Shield Icon" />
+  <img src="./assets/icons/squircle/telemetry-shield.png" width="108" alt="Telemetry Shield Icon" />
 </p>
 
 # loon-extra
@@ -54,6 +57,7 @@ Verified with `printf '%s' '<url>' | shasum -a 256`:
 
 ## Documentation & Templates
 
+- **Icon Design System (`G²` Squircle & Liquid Glass SVGs)**: [`docs/icon-design-system.md`](./docs/icon-design-system.md)
 - **Integration Guide for `FinalV1_cleaned.lcf`**: [`docs/finalv1-integration.md`](./docs/finalv1-integration.md)
 - **SHA-256 `#!source` Guide**: [`docs/sha256-guide.md`](./docs/sha256-guide.md)
 - **Sanitized Base Config Template**: [`templates/loon-base.example.lcf`](./templates/loon-base.example.lcf)
