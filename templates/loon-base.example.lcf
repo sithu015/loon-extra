@@ -46,8 +46,8 @@ ShadowShare = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,�
 🤖 AI Services = select,🇺🇸 United States,🇸🇬 Singapore,🇯🇵 Japan,⚡ Auto (All),ShadowShare,DIRECT
 🎬 Streaming = select,🇸🇬 Singapore,⚡ Auto (All),🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
 💬 Social Media = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,🇯🇵 Japan,ShadowShare,DIRECT
-# Keep 🔍 Search & Tech aligned with 🤖 AI Services (🇺🇸 United States) to prevent Google/Gemini split-IP errors
-🔍 Search & Tech = select,🇺🇸 United States,🇸🇬 Singapore,⚡ Auto (All),DIRECT
+# Keep 🔍 Search & Tech aligned with ShadowShare (⚡ Auto (All)) so Cloudflare Turnstile (challenges.cloudflare.com) shares the same exit IP as general websites
+🔍 Search & Tech = select,⚡ Auto (All),🇸🇬 Singapore,🇺🇸 United States,DIRECT
 🍎 Apple Services = select,DIRECT,⚡ Auto (All),🇺🇸 United States,ShadowShare
 🛑 AdBlock = select,REJECT,DIRECT
 
@@ -120,6 +120,12 @@ DOMAIN-SUFFIX,antigravity.google,🤖 AI Services
 DOMAIN-SUFFIX,antigravity.google.com,🤖 AI Services
 DOMAIN-SUFFIX,cloudcode-pa.googleapis.com,🤖 AI Services
 DOMAIN-SUFFIX,daily-cloudcode-pa.googleapis.com,🤖 AI Services
+# Keep core Google domains under 🤖 AI Services so Gemini/Google Auth share one unified exit IP
+DOMAIN-SUFFIX,google.com,🤖 AI Services
+DOMAIN-SUFFIX,google.com.sg,🤖 AI Services
+DOMAIN-SUFFIX,gstatic.com,🤖 AI Services
+DOMAIN-SUFFIX,googleapis.com,🤖 AI Services
+DOMAIN-SUFFIX,googleusercontent.com,🤖 AI Services
 DOMAIN-KEYWORD,openaicom,🤖 AI Services
 DOMAIN-KEYWORD,colab,🤖 AI Services
 
@@ -188,12 +194,7 @@ DOMAIN-SUFFIX,signal.org,💬 Social Media
 DOMAIN-SUFFIX,viber.com,💬 Social Media
 DOMAIN-SUFFIX,viberlab.com,💬 Social Media
 
-# --- Search & Tech ---
-DOMAIN-SUFFIX,google.com,🔍 Search & Tech
-DOMAIN-SUFFIX,google.com.sg,🔍 Search & Tech
-DOMAIN-SUFFIX,gstatic.com,🔍 Search & Tech
-DOMAIN-SUFFIX,googleapis.com,🔍 Search & Tech
-DOMAIN-SUFFIX,googleusercontent.com,🔍 Search & Tech
+# --- Search & Tech (Microsoft, GitHub, Cloudflare, Dev & Cloud) ---
 DOMAIN-SUFFIX,github.com,🔍 Search & Tech
 DOMAIN-SUFFIX,githubassets.com,🔍 Search & Tech
 DOMAIN-SUFFIX,githubusercontent.com,🔍 Search & Tech
